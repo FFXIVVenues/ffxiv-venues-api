@@ -53,7 +53,8 @@ namespace FFXIVVenues.Api.Controllers
         [HttpPut("{id}")]
         public ActionResult Put(string id, [FromBody] VenueModels.V2022.Venue venue)
         {
-            venue.Id = id;
+            if (venue.Id != id)
+                return BadRequest("Venue ID does not match.");
 
             var existingVenue = _repository.GetById<InternalModel.Venue>(id);
             if (existingVenue == null)
@@ -63,14 +64,14 @@ namespace FFXIVVenues.Api.Controllers
 
                 var owningKey = _authorizationManager.GetKey();
                 _repository.Upsert(InternalModel.Venue.CreateFromPublicModel(venue, owningKey));
-                return NoContent();
+                return Ok(venue);
             }
 
             if (_authorizationManager.Check().CanNot(Operation.Update, existingVenue))
                 return Unauthorized();
 
             _repository.Upsert(existingVenue.UpdateFromPublicModel(venue));
-            return NoContent();
+            return Ok(venue);
         }
 
         [HttpDelete("{id}")]
@@ -84,7 +85,7 @@ namespace FFXIVVenues.Api.Controllers
             if (venue.Banner != null)
                 _mediaManager.Delete(venue.Banner);
             _repository.Delete<InternalModel.Venue>(id);
-            return NoContent();
+            return Ok(venue);
         }
 
         [HttpPut("{id}/approved")]
@@ -102,7 +103,7 @@ namespace FFXIVVenues.Api.Controllers
                 venue.Approved = approved;
                 _repository.Upsert(venue);
             }
-            return NoContent();
+            return Ok(venue);
         }
 
         [HttpPut("{id}/open")]
@@ -126,7 +127,7 @@ namespace FFXIVVenues.Api.Controllers
             venue.OpenOverrides = newOverrides;
 
             _repository.Upsert(venue);
-            return NoContent();
+            return Ok(venue);
         }
 
     }
