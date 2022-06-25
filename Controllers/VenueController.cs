@@ -36,9 +36,9 @@ namespace FFXIVVenues.Api.Controllers
             if (manager != null)
                 query = query.Where(v => v.Managers.Contains(manager));
             if (dataCenter != null)
-                query = query.Where(v => v.Location.DataCenter == dataCenter);
+                query = query.Where(v => string.Equals(v.Location.DataCenter, dataCenter, StringComparison.InvariantCultureIgnoreCase));
             if (world != null)
-                query = query.Where(v => v.Location.World == world);
+                query = query.Where(v => string.Equals(v.Location.World, world, StringComparison.InvariantCultureIgnoreCase));
             if (approved != null)
                 query = query.Where(v => v.Approved == approved);
             if (open != null)
