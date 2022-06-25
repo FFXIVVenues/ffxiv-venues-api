@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
-using FFXIVVenues.VenueModels.V2022;
 
 namespace FFXIVVenues.Api.Controllers
 {
@@ -27,11 +26,23 @@ namespace FFXIVVenues.Api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<VenueModels.V2022.Venue> Get(string manager = null)
+        public IEnumerable<VenueModels.V2022.Venue> Get(string manager = null, 
+                                                        string dataCenter = null, 
+                                                        string world = null, 
+                                                        bool? approved = null, 
+                                                        bool? open = null)
         {
             var query = _repository.GetAll<InternalModel.Venue>();
             if (manager != null)
                 query = query.Where(v => v.Managers.Contains(manager));
+            if (dataCenter != null)
+                query = query.Where(v => v.Location.DataCenter == dataCenter);
+            if (world != null)
+                query = query.Where(v => v.Location.World == world);
+            if (approved != null)
+                query = query.Where(v => v.Approved == approved);
+            if (open != null)
+                query = query.Where(v => v.IsOpen() == open);
             if (_authorizationManager.Check().CanNot(Operation.Approve))
                 query = query.Where(v => v.Approved);
 
