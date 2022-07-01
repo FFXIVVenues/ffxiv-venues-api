@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
+using FFXIVVenues.Api.Observability;
 
 namespace FFXIVVenues.Api
 {
@@ -30,6 +31,7 @@ namespace FFXIVVenues.Api
             services.AddSingleton<IObjectRepository>(new LiteDbRepository(connectionString));
             services.AddSingleton<IMediaRepository, AzureMediaRepository>();
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
+            services.AddSingleton<IChangeBroker, ChangeBroker>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
             services.AddControllers();
             services.AddHttpContextAccessor();

@@ -1,4 +1,5 @@
 using FFXIVVenues.Api.Persistence;
+using System;
 
 namespace FFXIVVenues.Api.InternalModel
 {

@@ -5,6 +5,7 @@ using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.Api.InternalModel;
+using FFXIVVenues.Api.Observability;
 
 namespace FFXIVVenues.Api.Controllers
 {
@@ -16,16 +17,19 @@ namespace FFXIVVenues.Api.Controllers
         private readonly IMediaRepository _mediaManager;
         private readonly IObjectRepository _repository;
         private readonly IAuthorizationManager _authorizationManager;
+        private readonly IChangeBroker _changeBroker;
 
         public MediaController(ILogger<MediaController> logger,
                                IMediaRepository mediaManager,
                                IObjectRepository repository,
-                               IAuthorizationManager authorizationManager)
+                               IAuthorizationManager authorizationManager,
+                               IChangeBroker changeBroker)
         {
-            _logger = logger;
-            _mediaManager = mediaManager;
-            _repository = repository;
-            _authorizationManager = authorizationManager;
+            this._logger = logger;
+            this._mediaManager = mediaManager;
+            this._repository = repository;
+            this._authorizationManager = authorizationManager;
+            this._changeBroker = changeBroker;
         }
 
         [HttpGet("/venue/{id}/media")]
@@ -74,6 +78,7 @@ namespace FFXIVVenues.Api.Controllers
             {
                 venue.Banner = bannerId;
                 _repository.Upsert(venue);
+                this._changeBroker.Invoke(ObservableOperation.Update, venue);
             }
 
             return NoContent();
@@ -98,6 +103,7 @@ namespace FFXIVVenues.Api.Controllers
 
             venue.Banner = null;
             _repository.Upsert(venue);
+            this._changeBroker.Invoke(ObservableOperation.Update, venue);
 
             return NoContent();
         }
