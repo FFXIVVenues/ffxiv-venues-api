@@ -17,7 +17,7 @@ namespace FFXIVVenues.Api.Security
                 return op switch
                 {
                     Operation.Read => true,
-                    Operation.ReadInternal => true,
+                    Operation.ReadHidden => _key.ReadHidden,
                     Operation.Approve => _key.Approve,
                     Operation.Create => _key.Create,
                     Operation.Update => _key.Update,
@@ -37,7 +37,7 @@ namespace FFXIVVenues.Api.Security
             return entity.OwningKey == _key.Key && op switch
             {
                 Operation.Read => true,
-                Operation.ReadInternal => true,
+                Operation.ReadHidden => true,
                 Operation.Approve => _key.Approve,
                 Operation.Create => _key.Create,
                 Operation.Update => _key.Update,

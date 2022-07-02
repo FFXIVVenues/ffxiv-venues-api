@@ -36,7 +36,7 @@ namespace FFXIVVenues.Api.Controllers
         public async Task<ActionResult> GetAsync(string id)
         {
             var venue = _repository.GetById<Venue>(id);
-            if (venue == null || _authorizationManager.Check().CanNot(Operation.ReadInternal, venue) && !venue.Approved)
+            if (venue == null || _authorizationManager.Check().CanNot(Operation.ReadHidden, venue) && !venue.Approved)
             {
                 return NotFound();
             }

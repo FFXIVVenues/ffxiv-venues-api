@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace FFXIVVenues.Api.Controllers
 {
@@ -58,8 +59,8 @@ namespace FFXIVVenues.Api.Controllers
                 query = query.Where(v => v.Approved == approved);
             if (open != null)
                 query = query.Where(v => v.IsOpen() == open);
-            if (_authorizationManager.Check().CanNot(Operation.Approve))
-                query = query.Where(v => v.Approved);
+
+            query = query.ToList().Where(v => v.Approved && v.HiddenUntil < DateTime.UtcNow || this._authorizationManager.Check().Can(Operation.ReadHidden, v)).AsQueryable();
 
             return query.Select(v => v.ToPublicModel());
         }
@@ -68,7 +69,7 @@ namespace FFXIVVenues.Api.Controllers
         public ActionResult<VenueModels.V2022.Venue> GetById(string id, bool? recordView = true)
         {
             var venue = _repository.GetById<InternalModel.Venue>(id);
-            if (venue == null || _authorizationManager.Check().CanNot(Operation.Read, venue) && !venue.Approved)
+            if (venue == null || _authorizationManager.Check().CanNot(Operation.ReadHidden, venue) && !venue.Approved)
             {
                 return NotFound();
             }
@@ -151,6 +152,41 @@ namespace FFXIVVenues.Api.Controllers
             return Ok(venue);
         }
 
+        private static PropertyInfo _addedField = typeof(InternalModel.Venue).GetProperty("Added");
+        [HttpPut("{id}/added")]
+        public ActionResult Added(string id, [FromBody] DateTime added)
+        {
+            var venue = _repository.GetById<InternalModel.Venue>(id);
+            if (venue == null)
+                return NotFound();
+
+            if (_authorizationManager.Check().CanNot(Operation.Approve, venue))
+                return Unauthorized();
+
+            _addedField.SetValue(venue, added);
+
+            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            _repository.Upsert(venue);
+            return Ok(venue);
+        }
+
+        [HttpPut("{id}/hiddenUntil")]
+        public ActionResult HiddenUntil(string id, [FromBody] DateTime until)
+        {
+            var venue = _repository.GetById<InternalModel.Venue>(id);
+            if (venue == null)
+                return NotFound();
+
+            if (_authorizationManager.Check().CanNot(Operation.Update, venue))
+                return Unauthorized();
+
+            venue.HiddenUntil = until;
+
+            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            _repository.Upsert(venue);
+            return Ok(venue);
+        }
+
         [HttpPut("{id}/open")]
         public ActionResult Open(string id, [FromBody] bool open)
         {
@@ -187,7 +223,7 @@ namespace FFXIVVenues.Api.Controllers
                 observer.ObserverAction = async (op, venue) =>
                 {
                     if (webSocket.State == WebSocketState.Closed ||
-                        webSocket.State == WebSocketState.Aborted)
+                        webSocket.State == WebSocketState.Aborted) 
                     {
                         removeObserver();
                         return;

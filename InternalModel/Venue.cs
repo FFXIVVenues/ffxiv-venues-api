@@ -8,6 +8,7 @@ namespace FFXIVVenues.Api.InternalModel
 
         public string OwningKey { get; set; }
         public string Banner { get; set; }
+        public DateTime HiddenUntil { get; set; }
         public bool Approved { get; set; }
 
         public Venue UpdateFromPublicModel(VenueModels.V2022.Venue venue)
