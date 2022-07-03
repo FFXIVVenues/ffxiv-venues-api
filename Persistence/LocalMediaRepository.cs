@@ -62,6 +62,7 @@ namespace FFXIVVenues.Api.Persistence
                 disposedValue = true;
             }
         }
+
         public void Dispose()
         {
             Dispose(disposing: true);
