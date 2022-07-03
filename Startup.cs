@@ -21,15 +21,18 @@ namespace FFXIVVenues.Api
             _configuration = configuration;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = _configuration.GetValue<string>("Persistence:ConnectionString");
+            var mediaStorageProvider = _configuration.GetValue<string>("MediaStorage:Provider");
             var authorizationKeys = new List<AuthorizationKey>();
             _configuration.GetSection("Security:AuthorizationKeys").Bind(authorizationKeys);
 
             services.AddSingleton<IObjectRepository>(new LiteDbRepository(connectionString));
-            services.AddSingleton<IMediaRepository, AzureMediaRepository>();
+            if (mediaStorageProvider.ToLower() == "azure")
+                services.AddSingleton<IMediaRepository, AzureMediaRepository>();
+            else
+                services.AddSingleton<IMediaRepository, LocalMediaRepository>();
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
             services.AddSingleton<IChangeBroker, ChangeBroker>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
@@ -41,7 +44,6 @@ namespace FFXIVVenues.Api
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             var authorizationKey = _configuration.GetValue<string>("Security:AuthorizationKey");

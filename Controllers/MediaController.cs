@@ -44,9 +44,9 @@ namespace FFXIVVenues.Api.Controllers
             if (string.IsNullOrEmpty(venue.Banner))
                 return new FileStreamResult(System.IO.File.OpenRead("default-banner.jpg"), "image/jpg");
 
-            var blob = await _mediaManager.Download(venue.Banner, HttpContext.RequestAborted);
+            var (stream, contentType) = await _mediaManager.Download(venue.Banner, HttpContext.RequestAborted);
 
-            return File(blob.Content, blob.Details.ContentType);
+            return File(stream, contentType);
         }
 
         [HttpPut("/venue/{id}/media")]

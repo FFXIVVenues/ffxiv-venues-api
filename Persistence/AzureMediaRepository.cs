@@ -16,7 +16,7 @@ namespace FFXIVVenues.Api.Persistence
         public AzureMediaRepository(IConfiguration config) =>
             _config = config;
 
-        public async Task<BlobDownloadStreamingResult> Download(string key, CancellationToken cancellationToken)
+        public async Task<(Stream Stream, string ContentType)> Download(string key, CancellationToken cancellationToken)
         {
             var connectionString = _config.GetValue<string>("MediaStorage:ConnectionString");
             if (connectionString == null)
@@ -30,7 +30,7 @@ namespace FFXIVVenues.Api.Persistence
             var blob = container.GetBlobClient(key);
             var response = await blob.DownloadStreamingAsync(cancellationToken: cancellationToken);
 
-            return response.Value;
+            return (response.Value.Content, response.Value.Details.ContentType);
         }
 
         public async Task Upload(string key, string contentType, Stream stream, CancellationToken cancellationToken)
