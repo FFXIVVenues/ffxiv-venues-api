@@ -36,7 +36,8 @@ namespace FFXIVVenues.Api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<VenueModels.V2022.Venue> Get(string manager = null,
+        public IEnumerable<VenueModels.V2022.Venue> Get(string search = null,
+                                                        string manager = null,
                                                         string dataCenter = null,
                                                         string world = null,
                                                         string tags = null,
@@ -44,6 +45,8 @@ namespace FFXIVVenues.Api.Controllers
                                                         bool? open = null)
         {
             var query = _repository.GetAll<InternalModel.Venue>();
+            if (search != null)
+                query = query.Where(v => v.Name.ToLower().Contains(search.ToLower()));
             if (manager != null)
                 query = query.Where(v => v.Managers.Contains(manager));
             if (dataCenter != null)
