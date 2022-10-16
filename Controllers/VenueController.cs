@@ -190,8 +190,8 @@ namespace FFXIVVenues.Api.Controllers
             return Ok(venue);
         }
 
-        [HttpPut("{id}/open")]
-        public ActionResult Open(string id, [FromBody] bool open)
+        [HttpPost("{id}/open")]
+        public ActionResult Open(string id)
         {
             var venue = _repository.GetById<InternalModel.Venue>(id);
             if (venue == null)
@@ -201,12 +201,37 @@ namespace FFXIVVenues.Api.Controllers
                 return Unauthorized();
 
 
-            var newOverrides = venue.OpenOverrides.Where(o => o.Start > DateTime.UtcNow.AddHours(open ? 2.5 : 18)).ToList();
+            var newOverrides = venue.OpenOverrides.Where(o => o.Start > DateTime.UtcNow.AddHours(2.5)).ToList();
             newOverrides.Add(new()
             {
-                Open = open,
+                Open = true,
                 Start = DateTime.UtcNow,
-                End = DateTime.UtcNow.AddHours(open ? 2.5 : 18)
+                End = DateTime.UtcNow.AddHours(2.5)
+            });
+            venue.OpenOverrides = newOverrides;
+
+            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            _repository.Upsert(venue);
+            return Ok(venue);
+        }
+
+        [HttpPost("{id}/close")]
+        public ActionResult Close(string id, [FromBody]DateTime until)
+        {
+            var venue = _repository.GetById<InternalModel.Venue>(id);
+            if (venue == null)
+                return NotFound();
+
+            if (_authorizationManager.Check().CanNot(Operation.Update, venue)) 
+                return Unauthorized();
+
+
+            var newOverrides = venue.OpenOverrides.Where(o => o.Start > until).ToList();
+            newOverrides.Add(new()
+            {
+                Open = false,
+                Start = DateTime.UtcNow,
+                End = until
             });
             venue.OpenOverrides = newOverrides;
 
