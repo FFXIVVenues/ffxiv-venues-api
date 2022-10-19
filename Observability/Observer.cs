@@ -15,9 +15,9 @@ namespace FFXIVVenues.Api.Observability
 
         public IEnumerable<ObservableOperation> OperationCriteria { get; set; }
 
-        public Action<ObservableOperation, VenueModels.V2022.Venue> ObserverAction { get; internal set; }
+        public Action<ObservableOperation, VenueModels.Venue> ObserverAction { get; internal set; }
 
-        public bool Matches(ObservableOperation operation, VenueModels.V2022.Venue venue)
+        public bool Matches(ObservableOperation operation, VenueModels.Venue venue)
         {
             if (venue == null) return false;
             if (!OperationCriteria.Contains(operation)) return false;

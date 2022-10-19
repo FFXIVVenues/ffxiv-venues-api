@@ -3,15 +3,14 @@ using System;
 
 namespace FFXIVVenues.Api.InternalModel
 {
-    public class Venue : VenueModels.V2022.Venue, IEntity
+    public class Venue : VenueModels.Venue, IEntity
     {
 
         public string OwningKey { get; set; }
         public string Banner { get; set; }
         public DateTime HiddenUntil { get; set; }
-        public bool Approved { get; set; }
 
-        public Venue UpdateFromPublicModel(VenueModels.V2022.Venue venue)
+        public Venue UpdateFromPublicModel(VenueModels.Venue venue)
         {
             this.Name = venue.Name;
             this.Description = venue.Description;
@@ -25,10 +24,12 @@ namespace FFXIVVenues.Api.InternalModel
             this.Tags = venue.Tags;
             this.Managers = venue.Managers;
             this.Notices = venue.Notices;
+            this.MareCode = venue.MareCode;
+            this.MarePassword = venue.MarePassword;
             return this;
         }
 
-        public static Venue CreateFromPublicModel(VenueModels.V2022.Venue venue, string owningKey)
+        public static Venue CreateFromPublicModel(VenueModels.Venue venue, string owningKey)
         {
             var newInternalVenue = new Venue();
             newInternalVenue.Id = venue.Id;
@@ -37,9 +38,9 @@ namespace FFXIVVenues.Api.InternalModel
             return newInternalVenue;
         }
 
-        internal VenueModels.V2022.Venue ToPublicModel()
+        internal VenueModels.Venue ToPublicModel()
         {
-            return new VenueModels.V2022.Venue
+            return new VenueModels.Venue
             {
                 Added = this.Added,
                 Id = this.Id,
@@ -54,7 +55,10 @@ namespace FFXIVVenues.Api.InternalModel
                 OpenOverrides = this.OpenOverrides,
                 Sfw = this.Sfw,
                 Tags = this.Tags,
-                Website = this.Website
+                Website = this.Website,
+                Approved = this.Approved,
+                MareCode = this.MareCode,
+                MarePassword = this.MarePassword
             };
         }
     }

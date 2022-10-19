@@ -1,4 +1,4 @@
-﻿using FFXIVVenues.VenueModels.V2022;
+﻿using FFXIVVenues.VenueModels;
 using System;
 using System.Collections.Generic;
 

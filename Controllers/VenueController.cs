@@ -36,7 +36,7 @@ namespace FFXIVVenues.Api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<VenueModels.V2022.Venue> Get(string search = null,
+        public IEnumerable<VenueModels.Venue> Get(string search = null,
                                                         string manager = null,
                                                         string dataCenter = null,
                                                         string world = null,
@@ -69,7 +69,7 @@ namespace FFXIVVenues.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<VenueModels.V2022.Venue> GetById(string id, bool? recordView = true)
+        public ActionResult<VenueModels.Venue> GetById(string id, bool? recordView = true)
         {
             var venue = _repository.GetById<InternalModel.Venue>(id);
             if (venue == null || _authorizationManager.Check().CanNot(Operation.ReadHidden, venue) && !venue.Approved)
@@ -82,7 +82,7 @@ namespace FFXIVVenues.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult Put(string id, [FromBody] VenueModels.V2022.Venue venue)
+        public ActionResult Put(string id, [FromBody] VenueModels.Venue venue)
         {
             if (venue.Id != id)
                 return BadRequest("Venue ID does not match.");
@@ -152,7 +152,7 @@ namespace FFXIVVenues.Api.Controllers
                 this._repository.Upsert(venue);
                 this._changeBroker.Invoke(approved ? ObservableOperation.Create : ObservableOperation.Delete, venue);
             }
-            return Ok(venue);
+            return Ok(venue.ToPublicModel());
         }
 
         private static PropertyInfo _addedField = typeof(InternalModel.Venue).GetProperty("Added");
