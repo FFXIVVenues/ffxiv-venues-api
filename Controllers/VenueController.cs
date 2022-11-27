@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
@@ -152,7 +152,7 @@ namespace FFXIVVenues.Api.Controllers
                 this._repository.Upsert(venue);
                 this._changeBroker.Invoke(approved ? ObservableOperation.Create : ObservableOperation.Delete, venue);
             }
-            return Ok(venue.ToPublicModel());
+            return Ok(venue);
         }
 
         private static PropertyInfo _addedField = typeof(InternalModel.Venue).GetProperty("Added");
@@ -190,8 +190,8 @@ namespace FFXIVVenues.Api.Controllers
             return Ok(venue);
         }
 
-        [HttpPut("{id}/open")]
-        public ActionResult Open(string id, [FromBody] bool open)
+        [HttpPost("{id}/open")]
+        public ActionResult Open(string id, [FromBody] DateTime until)
         {
             var venue = _repository.GetById<InternalModel.Venue>(id);
             if (venue == null)
@@ -200,13 +200,40 @@ namespace FFXIVVenues.Api.Controllers
             if (_authorizationManager.Check().CanNot(Operation.Update, venue))
                 return Unauthorized();
 
-
-            var newOverrides = venue.OpenOverrides.Where(o => o.Start > DateTime.UtcNow.AddHours(open ? 2.5 : 18)).ToList();
+            if (until > DateTime.UtcNow.AddHours(6))
+                return BadRequest("Cannot open for more than 6 hours ahead.");
+            
+            var newOverrides = venue.OpenOverrides.Where(o => o.Start > until).ToList();
             newOverrides.Add(new()
             {
-                Open = open,
+                Open = true,
                 Start = DateTime.UtcNow,
-                End = DateTime.UtcNow.AddHours(open ? 2.5 : 18)
+                End = until
+            });
+            venue.OpenOverrides = newOverrides;
+
+            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._repository.Upsert(venue);
+            return Ok(venue);
+        }
+
+        [HttpPost("{id}/close")]
+        public ActionResult Close(string id, [FromBody] DateTime until)
+        {
+            var venue = _repository.GetById<InternalModel.Venue>(id);
+            if (venue == null)
+                return NotFound();
+
+            if (_authorizationManager.Check().CanNot(Operation.Update, venue)) 
+                return Unauthorized();
+
+
+            var newOverrides = venue.OpenOverrides.Where(o => o.Start > until).ToList();
+            newOverrides.Add(new()
+            {
+                Open = false,
+                Start = DateTime.UtcNow,
+                End = until
             });
             venue.OpenOverrides = newOverrides;
 
