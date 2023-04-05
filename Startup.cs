@@ -23,6 +23,8 @@ namespace FFXIVVenues.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
+            
             var connectionString = _configuration.GetValue<string>("Persistence:ConnectionString");
             var mediaStorageProvider = _configuration.GetValue<string>("MediaStorage:Provider");
             var authorizationKeys = new List<AuthorizationKey>();
