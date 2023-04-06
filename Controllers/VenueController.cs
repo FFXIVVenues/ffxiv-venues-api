@@ -65,7 +65,7 @@ namespace FFXIVVenues.Api.Controllers
 
             query = query.ToList().Where(v => v.Approved && v.HiddenUntil < DateTime.UtcNow || this._authorizationManager.Check().Can(Operation.ReadHidden, v)).AsQueryable();
 
-            return query.Select(v => v.ToPublicModel());
+            return query.Select(v => v.ToPublicModel(_mediaManager));
         }
 
         [HttpGet("{id}")]
@@ -78,7 +78,7 @@ namespace FFXIVVenues.Api.Controllers
             }
             if (recordView == null || recordView == true)
                 _repository.Upsert(new InternalModel.ViewRecord(id));
-            return venue.ToPublicModel();
+            return venue.ToPublicModel(_mediaManager);
         }
 
         [HttpPut("{id}")]

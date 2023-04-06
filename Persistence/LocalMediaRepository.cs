@@ -4,11 +4,13 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace FFXIVVenues.Api.Persistence
 {
     public class LocalMediaRepository : IMediaRepository, IDisposable
     {
+        private readonly IHttpContextAccessor _contextAccessor;
 
         private const string MEDIA_LOCATION = "media/";
         private const string TYPES_FILE = MEDIA_LOCATION + "contentTypes";
@@ -16,8 +18,9 @@ namespace FFXIVVenues.Api.Persistence
         private readonly Timer _timer;
         private bool disposedValue;
 
-        public LocalMediaRepository()
+        public LocalMediaRepository(IHttpContextAccessor contextAccessor)
         {
+            _contextAccessor = contextAccessor;
             Directory.CreateDirectory(MEDIA_LOCATION);
             if (File.Exists(TYPES_FILE))
                 this._contentTypes = File.ReadAllLines(TYPES_FILE).ToDictionary(l => l.Split("::")[0], l => l.Split("::")[1]);
@@ -38,6 +41,19 @@ namespace FFXIVVenues.Api.Persistence
             if (!this._contentTypes.ContainsKey(key))
                 return Task.FromResult((Stream.Null, ""));
             return Task.FromResult((File.OpenRead(MEDIA_LOCATION + key) as Stream, this._contentTypes[key]));
+        }
+
+        public Uri GetUri(string key)
+        {
+            if (this._contextAccessor.HttpContext == null)
+            {
+                return null;
+            }
+
+            return new Uri($"{this._contextAccessor.HttpContext.Request.Scheme}://" +
+                           this._contextAccessor.HttpContext.Request.Host +
+                           this._contextAccessor.HttpContext.Request.PathBase +
+                           "/" + key);
         }
 
         public async Task Upload(string key, string contentType, Stream stream, CancellationToken _)

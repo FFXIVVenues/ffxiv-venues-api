@@ -38,13 +38,14 @@ namespace FFXIVVenues.Api.InternalModel
             return newInternalVenue;
         }
 
-        internal VenueModels.Venue ToPublicModel()
+        internal VenueModels.Venue ToPublicModel(IMediaRepository mediaRepo)
         {
             return new VenueModels.Venue
             {
                 Added = this.Added,
                 Id = this.Id,
                 Description = this.Description,
+                BannerUri = this.Banner != null ? mediaRepo.GetUri(this.Banner) : null,
                 Discord = this.Discord,
                 Location = this.Location,
                 Managers = this.Managers,
