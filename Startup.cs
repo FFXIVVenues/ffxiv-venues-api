@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FFXIVVenues.Api.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Observability;
+using FFXIVVenues.VenueModels;
 
 namespace FFXIVVenues.Api
 {
@@ -23,6 +25,8 @@ namespace FFXIVVenues.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var venueCache = new RollingCache<IEnumerable<Venue>>(3*60*1000, 30*60*1000);
+
             var connectionString = _configuration.GetValue<string>("Persistence:ConnectionString");
             var mediaStorageProvider = _configuration.GetValue<string>("MediaStorage:Provider");
             var authorizationKeys = new List<AuthorizationKey>();
@@ -33,6 +37,7 @@ namespace FFXIVVenues.Api
                 services.AddSingleton<IMediaRepository, AzureMediaRepository>();
             else
                 services.AddSingleton<IMediaRepository, LocalMediaRepository>();
+            services.AddSingleton(venueCache);
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
             services.AddSingleton<IChangeBroker, ChangeBroker>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);

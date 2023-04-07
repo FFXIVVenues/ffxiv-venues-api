@@ -11,6 +11,8 @@ using System.Threading;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.Reflection;
+using FFXIVVenues.Api.Helpers;
+using FFXIVVenues.VenueModels;
 
 namespace FFXIVVenues.Api.Controllers
 {
@@ -23,27 +25,35 @@ namespace FFXIVVenues.Api.Controllers
         private readonly IMediaRepository _mediaManager;
         private readonly IAuthorizationManager _authorizationManager;
         private readonly IChangeBroker _changeBroker;
+        private readonly RollingCache<IEnumerable<Venue>> _cache;
 
         public VenueController(IObjectRepository repository,
                                IMediaRepository mediaManager,
                                IAuthorizationManager authorizationManager,
-                               IChangeBroker changeBroker)
+                               IChangeBroker changeBroker, 
+                               RollingCache<IEnumerable<Venue>> cache)
         {
             this._repository = repository;
             this._mediaManager = mediaManager;
             this._authorizationManager = authorizationManager;
             this._changeBroker = changeBroker;
+            this._cache = cache;
         }
 
         [HttpGet]
         public IEnumerable<VenueModels.Venue> Get(string search = null,
-                                                        string manager = null,
-                                                        string dataCenter = null,
-                                                        string world = null,
-                                                        string tags = null,
-                                                        bool? approved = null,
-                                                        bool? open = null)
+                                                    string manager = null,
+                                                    string dataCenter = null,
+                                                    string world = null,
+                                                    string tags = null,
+                                                    bool? approved = null,
+                                                    bool? open = null)
         {
+            var cacheKey = $"*|{search}|{manager}|{world}|{tags}|{approved}|{open}";
+            var cache = this._cache.Get(cacheKey);
+            if (cache != null)
+                return cache;
+            
             var query = _repository.GetAll<InternalModel.Venue>();
             if (search != null)
                 query = query.Where(v => v.Name.ToLower().Contains(search.ToLower()));
@@ -63,9 +73,14 @@ namespace FFXIVVenues.Api.Controllers
             if (open != null)
                 query = query.Where(v => v.IsOpen() == open);
 
-            query = query.ToList().Where(v => v.Approved && v.HiddenUntil < DateTime.UtcNow || this._authorizationManager.Check().Can(Operation.ReadHidden, v)).AsQueryable();
-
-            return query.Select(v => v.ToPublicModel(_mediaManager));
+            query = query.ToList()
+                .Where(v => v.Approved && v.HiddenUntil < DateTime.UtcNow || this._authorizationManager.Check().Can(Operation.ReadHidden, v))
+                .AsQueryable();
+            
+            var result = query.Select(v => v.ToPublicModel(_mediaManager));
+            this._cache.Set(cacheKey, result);
+            
+            return result;
         }
 
         [HttpGet("{id}")]
@@ -104,6 +119,8 @@ namespace FFXIVVenues.Api.Controllers
             _repository.Upsert(existingVenue.UpdateFromPublicModel(venue));
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
 
+            this._cache.Clear();
+            
             return Ok(venue);
         }
 
@@ -119,6 +136,9 @@ namespace FFXIVVenues.Api.Controllers
                 _mediaManager.Delete(venue.Banner);
             _repository.Delete<InternalModel.Venue>(id);
             this._changeBroker.Invoke(ObservableOperation.Delete, venue);
+            
+            this._cache.Clear();
+            
             return Ok(venue);
         }
 
@@ -133,6 +153,8 @@ namespace FFXIVVenues.Api.Controllers
             if (_authorizationManager.Check().CanNot(Operation.Approve, venue))
                 return Unauthorized();
 
+            this._cache.Clear();
+            
             return Ok(venue.Approved);
         }
 
