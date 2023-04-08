@@ -43,7 +43,7 @@ namespace FFXIVVenues.Api.Persistence
             return Task.FromResult((File.OpenRead(MEDIA_LOCATION + key) as Stream, this._contentTypes[key]));
         }
 
-        public Uri GetUri(string key)
+        public Uri GetUri(string venueId, string key)
         {
             if (this._contextAccessor.HttpContext == null)
             {
@@ -53,7 +53,7 @@ namespace FFXIVVenues.Api.Persistence
             return new Uri($"{this._contextAccessor.HttpContext.Request.Scheme}://" +
                            this._contextAccessor.HttpContext.Request.Host +
                            this._contextAccessor.HttpContext.Request.PathBase +
-                           "/" + key);
+                           $"/venue/{venueId}/media");
         }
 
         public async Task Upload(string key, string contentType, Stream stream, CancellationToken _)

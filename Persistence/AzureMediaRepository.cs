@@ -25,7 +25,7 @@ namespace FFXIVVenues.Api.Persistence
             return (response.Value.Content, response.Value.Details.ContentType);
         }
 
-        public Uri GetUri(string key)
+        public Uri GetUri(string venueId, string key)
         {
             var container = GetBlobContainerClient();
             return new Uri(container.Uri + "/" + key);

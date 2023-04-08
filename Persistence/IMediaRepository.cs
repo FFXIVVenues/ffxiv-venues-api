@@ -9,7 +9,7 @@ namespace FFXIVVenues.Api.Persistence
     {
         Task Delete(string key);
         Task<(Stream Stream, string ContentType)> Download(string key, CancellationToken cancellationToken);
-        Uri GetUri(string key);
+        Uri GetUri(string venueId, string key);
         Task Upload(string key, string contentType, Stream stream, CancellationToken cancellationToken);
     }
 }
