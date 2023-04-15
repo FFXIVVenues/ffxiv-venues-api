@@ -18,7 +18,7 @@ namespace FFXIVVenues.Api.InternalModel
             this.Website = venue.Website;
             this.Discord = venue.Discord;
             this.Sfw = venue.Sfw;
-            this.Nsfw = venue.Nsfw;
+            this.Hiring = venue.Hiring;
             this.Openings = venue.Openings;
             this.OpenOverrides = venue.OpenOverrides;
             this.Tags = venue.Tags;
@@ -51,7 +51,7 @@ namespace FFXIVVenues.Api.InternalModel
                 Managers = this.Managers,
                 Name = this.Name,
                 Notices = this.Notices,
-                Nsfw = this.Nsfw,
+                Hiring = this.Hiring,
                 Openings = this.Openings,
                 OpenOverrides = this.OpenOverrides,
                 Sfw = this.Sfw,
