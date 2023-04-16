@@ -65,18 +65,27 @@ namespace FFXIVVenues.Api.Helpers
         {
             this._set.Clear();
             this._items.Clear();
-            this._items.Clear();
+            this._lastAccess.Clear();
         }
 
         private void ExpireItems()
         {
-            foreach (var keyValuePair in _lastAccess)
+            try
             {
-                if (keyValuePair.Value > DateTime.UtcNow.AddMilliseconds(-this.TimeoutInMs) 
-                    && _set[keyValuePair.Key] > DateTime.UtcNow.AddMilliseconds(-this.MaxAgeInMs))
-                    continue;
-                
-                Remove(keyValuePair.Key);
+                foreach (var keyValuePair in _lastAccess)
+                {
+                    if (keyValuePair.Value > DateTime.UtcNow.AddMilliseconds(-this.TimeoutInMs)
+                        && _set[keyValuePair.Key] > DateTime.UtcNow.AddMilliseconds(-this.MaxAgeInMs))
+                        continue;
+
+                    Remove(keyValuePair.Key);
+                }
+            } 
+            catch (Exception e)
+            {
+                Console.Error.WriteLineAsync(e.ToString());
+                // If we can't expire cleanly, we'll need to wipe to ensure latest data rather than force cache
+                this.Clear(); 
             }
         }
 
