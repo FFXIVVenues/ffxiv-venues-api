@@ -10,6 +10,6 @@ namespace FFXIVVenues.Api.Persistence
         Task Delete(string key);
         Task<(Stream Stream, string ContentType)> Download(string key, CancellationToken cancellationToken);
         Uri GetUri(string key);
-        Task Upload(string key, string contentType, Stream stream, CancellationToken cancellationToken);
+        Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken);
     }
 }

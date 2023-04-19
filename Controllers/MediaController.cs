@@ -54,33 +54,22 @@ namespace FFXIVVenues.Api.Controllers
         {
             var venue = _repository.GetById<Venue>(id);
             if (venue == null)
-            {
                 return NotFound();
-            }
-
             if (_authorizationManager.Check().CanNot(Operation.Update, venue))
                 return Unauthorized();
-
             if (Request.ContentLength > 1_048_576)
                 return BadRequest();
-
-            if (!Request.ContentType.StartsWith("image/"))
+            if (Request.ContentType?.StartsWith("image/") == false)
                 return BadRequest();
-
 
             var bannerId = venue.Banner;
             if (string.IsNullOrEmpty(bannerId))
-                bannerId = IdHelper.GenerateId();
+                await _mediaManager.Delete(bannerId);
 
-            await _mediaManager.Upload(bannerId, Request.ContentType, Request.Body, HttpContext.RequestAborted);
-
-            if (venue.Banner != bannerId)
-            {
-                venue.Banner = bannerId;
-                _repository.Upsert(venue);
-                this._changeBroker.Invoke(ObservableOperation.Update, venue);
-            }
-
+            venue.Banner = await _mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
+            _repository.Upsert(venue);
+            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            
             return NoContent();
         }
 

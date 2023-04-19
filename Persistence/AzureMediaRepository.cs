@@ -6,12 +6,13 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using FFXIVVenues.Api.Helpers;
 
 namespace FFXIVVenues.Api.Persistence
 {
     public class AzureMediaRepository : IMediaRepository
     {
-        private IConfiguration _config;
+        private readonly IConfiguration _config;
 
         public AzureMediaRepository(IConfiguration config) =>
             _config = config;
@@ -27,19 +28,21 @@ namespace FFXIVVenues.Api.Persistence
 
         public Uri GetUri(string key)
         {
-            var container = GetBlobContainerClient();
-            return new Uri(container.Uri + "/" + key);
+            var template = this._config.GetValue<string>("MediaStorage:BlobUriTemplate");
+            return template == null ? null : new Uri(template.Replace("{key}", key));
         }
 
-        public async Task Upload(string key, string contentType, Stream stream, CancellationToken cancellationToken)
+        public async Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken)
         {
+            var key = IdHelper.GenerateId();
             var container = GetBlobContainerClient();
             var blob = container.GetBlobClient(key);
-            await blob.DeleteIfExistsAsync();
+            await blob.DeleteIfExistsAsync(cancellationToken:cancellationToken);
             _ = await blob.UploadAsync(stream,
-                                 httpHeaders: new BlobHttpHeaders() { ContentType = contentType },
+                                 httpHeaders: new BlobHttpHeaders { ContentType = contentType },
                                  transferOptions: new StorageTransferOptions { MaximumTransferSize = 1_048_576 },
                                  cancellationToken: cancellationToken);
+            return key;
         }
 
         public async Task Delete(string key)
