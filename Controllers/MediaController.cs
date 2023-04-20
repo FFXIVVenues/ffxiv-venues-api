@@ -19,14 +19,14 @@ namespace FFXIVVenues.Api.Controllers
         private readonly IObjectRepository _repository;
         private readonly IAuthorizationManager _authorizationManager;
         private readonly IChangeBroker _changeBroker;
-        private readonly RollingCache<IEnumerable<Venue>> _cache;
+        private readonly RollingCache<IEnumerable<VenueModels.Venue>> _cache;
 
         public MediaController(ILogger<MediaController> logger,
                                IMediaRepository mediaManager,
                                IObjectRepository repository,
                                IAuthorizationManager authorizationManager,
                                IChangeBroker changeBroker,
-                               RollingCache<IEnumerable<Venue>> cache)
+                               RollingCache<IEnumerable<VenueModels.Venue>> cache)
         {
             this._logger = logger;
             this._mediaManager = mediaManager;
