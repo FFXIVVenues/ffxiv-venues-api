@@ -6,7 +6,10 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Identity;
 using FFXIVVenues.Api.Helpers;
+using Uri = System.Uri;
 
 namespace FFXIVVenues.Api.Persistence
 {
@@ -55,15 +58,21 @@ namespace FFXIVVenues.Api.Persistence
         private BlobContainerClient GetBlobContainerClient()
         {
             var connectionString = _config.GetValue<string>("MediaStorage:ConnectionString");
-            if (connectionString == null)
-                throw new Exception("No connection string configured for media storage.");
+            if (connectionString != null)
+            {
+                var containerName = _config.GetValue<string>("MediaStorage:ContainerName");
+                if (containerName == null)
+                    throw new Exception("No connection string configured for media storage.");
 
-            var containerName = _config.GetValue<string>("MediaStorage:ContainerName");
-            if (containerName == null)
-                throw new Exception("No connection string configured for media storage.");
+                return new BlobContainerClient(connectionString, containerName);
+            }
+            
+            var containerUri = _config.GetValue<string>("MediaStorage:ContainerUri");
+            if (containerUri != null)
+                return new BlobContainerClient(new Uri(containerUri), new DefaultAzureCredential());
 
-            var container = new BlobContainerClient(connectionString, containerName);
-            return container;
+            throw new Exception("No connection string or container uri configured for media storage.");
+        
         }
 
     }
