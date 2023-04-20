@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using FFXIVVenues.Api.Persistence;
@@ -18,18 +19,21 @@ namespace FFXIVVenues.Api.Controllers
         private readonly IObjectRepository _repository;
         private readonly IAuthorizationManager _authorizationManager;
         private readonly IChangeBroker _changeBroker;
+        private readonly RollingCache<IEnumerable<Venue>> _cache;
 
         public MediaController(ILogger<MediaController> logger,
                                IMediaRepository mediaManager,
                                IObjectRepository repository,
                                IAuthorizationManager authorizationManager,
-                               IChangeBroker changeBroker)
+                               IChangeBroker changeBroker,
+                               RollingCache<IEnumerable<Venue>> cache)
         {
             this._logger = logger;
             this._mediaManager = mediaManager;
             this._repository = repository;
             this._authorizationManager = authorizationManager;
             this._changeBroker = changeBroker;
+            this._cache = cache;
         }
 
         [HttpGet("/venue/{id}/media")]
@@ -67,7 +71,8 @@ namespace FFXIVVenues.Api.Controllers
                 await _mediaManager.Delete(bannerId);
 
             venue.Banner = await _mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
-            _repository.Upsert(venue);
+            this._repository.Upsert(venue);
+            this._cache.Clear();
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             
             return NoContent();
@@ -92,6 +97,7 @@ namespace FFXIVVenues.Api.Controllers
 
             venue.Banner = null;
             _repository.Upsert(venue);
+            this._cache.Clear();
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
 
             return NoContent();
