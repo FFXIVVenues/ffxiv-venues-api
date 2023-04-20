@@ -66,9 +66,8 @@ namespace FFXIVVenues.Api.Controllers
             if (Request.ContentType?.StartsWith("image/") == false)
                 return BadRequest();
 
-            var bannerId = venue.Banner;
-            if (string.IsNullOrEmpty(bannerId))
-                await _mediaManager.Delete(bannerId);
+            if (!string.IsNullOrEmpty(venue.Banner))
+                await _mediaManager.Delete(venue.Banner);
 
             venue.Banner = await _mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
             this._repository.Upsert(venue);

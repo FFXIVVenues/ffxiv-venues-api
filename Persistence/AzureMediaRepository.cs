@@ -40,7 +40,6 @@ namespace FFXIVVenues.Api.Persistence
             var key = IdHelper.GenerateId();
             var container = GetBlobContainerClient();
             var blob = container.GetBlobClient(key);
-            await blob.DeleteIfExistsAsync(cancellationToken:cancellationToken);
             _ = await blob.UploadAsync(stream,
                                  httpHeaders: new BlobHttpHeaders { ContentType = contentType },
                                  transferOptions: new StorageTransferOptions { MaximumTransferSize = 1_048_576 },
