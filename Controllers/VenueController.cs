@@ -116,16 +116,17 @@ namespace FFXIVVenues.Api.Controllers
             if (_authorizationManager.Check().CanNot(Operation.Update, existingVenue))
                 return Unauthorized();
 
-            _repository.Upsert(existingVenue.UpdateFromPublicModel(venue));
+            var repoVenue = existingVenue.UpdateFromPublicModel(venue);
+            _repository.Upsert(repoVenue);
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
 
             this._cache.Clear();
             
-            return Ok(venue);
+            return Ok(repoVenue.ToPublicModel(_mediaManager));
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(string id)
+        public ActionResult<VenueModels.Venue> Delete(string id)
         {
             var venue = _repository.GetById<InternalModel.Venue>(id);
             if (venue == null)
@@ -139,7 +140,7 @@ namespace FFXIVVenues.Api.Controllers
             
             this._cache.Clear();
             
-            return Ok(venue);
+            return Ok(venue.ToPublicModel(_mediaManager));
         }
 
 
@@ -174,7 +175,7 @@ namespace FFXIVVenues.Api.Controllers
                 this._repository.Upsert(venue);
                 this._changeBroker.Invoke(approved ? ObservableOperation.Create : ObservableOperation.Delete, venue);
             }
-            return Ok(venue);
+            return Ok(venue.ToPublicModel(_mediaManager));
         }
 
         private static PropertyInfo _addedField = typeof(InternalModel.Venue).GetProperty("Added");
@@ -192,7 +193,7 @@ namespace FFXIVVenues.Api.Controllers
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             _repository.Upsert(venue);
-            return Ok(venue);
+            return Ok(venue.ToPublicModel(_mediaManager));
         }
 
         [HttpPut("{id}/hiddenUntil")]
@@ -209,7 +210,7 @@ namespace FFXIVVenues.Api.Controllers
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             _repository.Upsert(venue);
-            return Ok(venue);
+            return Ok(venue.ToPublicModel(_mediaManager));
         }
 
         [HttpPost("{id}/open")]
@@ -236,7 +237,7 @@ namespace FFXIVVenues.Api.Controllers
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
-            return Ok(venue);
+            return Ok(venue.ToPublicModel(_mediaManager));
         }
 
         [HttpPost("{id}/close")]
@@ -261,7 +262,7 @@ namespace FFXIVVenues.Api.Controllers
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             _repository.Upsert(venue);
-            return Ok(venue);
+            return Ok(venue.ToPublicModel(_mediaManager));
         }
 
         [HttpPut("observe")]
