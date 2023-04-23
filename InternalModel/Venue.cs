@@ -45,7 +45,7 @@ namespace FFXIVVenues.Api.InternalModel
                 Added = this.Added,
                 Id = this.Id,
                 Description = this.Description,
-                BannerUri = this.Banner != null ? mediaRepo.GetUri(this.Id, this.Banner) : null,
+                BannerUri = this.Banner != null ? mediaRepo.GetUri(this.Banner) : null,
                 Discord = this.Discord,
                 Location = this.Location,
                 Managers = this.Managers,

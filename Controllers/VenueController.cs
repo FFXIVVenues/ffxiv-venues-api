@@ -88,9 +88,8 @@ namespace FFXIVVenues.Api.Controllers
         {
             var venue = _repository.GetById<InternalModel.Venue>(id);
             if (venue == null || _authorizationManager.Check().CanNot(Operation.ReadHidden, venue) && !venue.Approved)
-            {
                 return NotFound();
-            }
+            
             if (recordView == null || recordView == true)
                 _repository.Upsert(new InternalModel.ViewRecord(id));
             return venue.ToPublicModel(_mediaManager);
@@ -109,7 +108,8 @@ namespace FFXIVVenues.Api.Controllers
                     return Unauthorized();
 
                 var owningKey = _authorizationManager.GetKey();
-                _repository.Upsert(InternalModel.Venue.CreateFromPublicModel(venue, owningKey));
+                this._repository.Upsert(InternalModel.Venue.CreateFromPublicModel(venue, owningKey));
+                this._cache.Clear();
                 return Ok(venue);
             }
 
@@ -173,6 +173,7 @@ namespace FFXIVVenues.Api.Controllers
             {
                 venue.Approved = approved;
                 this._repository.Upsert(venue);
+                this._cache.Clear();
                 this._changeBroker.Invoke(approved ? ObservableOperation.Create : ObservableOperation.Delete, venue);
             }
             return Ok(venue.ToPublicModel(_mediaManager));
@@ -193,6 +194,7 @@ namespace FFXIVVenues.Api.Controllers
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             _repository.Upsert(venue);
+            this._cache.Clear();
             return Ok(venue.ToPublicModel(_mediaManager));
         }
 
@@ -209,7 +211,8 @@ namespace FFXIVVenues.Api.Controllers
             venue.HiddenUntil = until;
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
-            _repository.Upsert(venue);
+            this._repository.Upsert(venue);
+            this._cache.Clear();
             return Ok(venue.ToPublicModel(_mediaManager));
         }
 
@@ -237,6 +240,7 @@ namespace FFXIVVenues.Api.Controllers
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
+            this._cache.Clear();
             return Ok(venue.ToPublicModel(_mediaManager));
         }
 
@@ -261,7 +265,8 @@ namespace FFXIVVenues.Api.Controllers
             venue.OpenOverrides = newOverrides;
 
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
-            _repository.Upsert(venue);
+            this._repository.Upsert(venue);
+            this._cache.Clear();
             return Ok(venue.ToPublicModel(_mediaManager));
         }
 

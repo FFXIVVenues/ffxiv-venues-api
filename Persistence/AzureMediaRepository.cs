@@ -6,12 +6,16 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Identity;
+using FFXIVVenues.Api.Helpers;
+using Uri = System.Uri;
 
 namespace FFXIVVenues.Api.Persistence
 {
     public class AzureMediaRepository : IMediaRepository
     {
-        private IConfiguration _config;
+        private readonly IConfiguration _config;
 
         public AzureMediaRepository(IConfiguration config) =>
             _config = config;
@@ -25,21 +29,22 @@ namespace FFXIVVenues.Api.Persistence
             return (response.Value.Content, response.Value.Details.ContentType);
         }
 
-        public Uri GetUri(string venueId, string key)
+        public Uri GetUri(string key)
         {
-            var container = GetBlobContainerClient();
-            return new Uri(container.Uri + "/" + key);
+            var template = this._config.GetValue<string>("MediaStorage:BlobUriTemplate");
+            return template == null ? null : new Uri(template.Replace("{key}", key));
         }
 
-        public async Task Upload(string key, string contentType, Stream stream, CancellationToken cancellationToken)
+        public async Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken)
         {
+            var key = IdHelper.GenerateId();
             var container = GetBlobContainerClient();
             var blob = container.GetBlobClient(key);
-            await blob.DeleteIfExistsAsync();
             _ = await blob.UploadAsync(stream,
-                                 httpHeaders: new BlobHttpHeaders() { ContentType = contentType },
+                                 httpHeaders: new BlobHttpHeaders { ContentType = contentType },
                                  transferOptions: new StorageTransferOptions { MaximumTransferSize = 1_048_576 },
                                  cancellationToken: cancellationToken);
+            return key;
         }
 
         public async Task Delete(string key)
@@ -52,15 +57,21 @@ namespace FFXIVVenues.Api.Persistence
         private BlobContainerClient GetBlobContainerClient()
         {
             var connectionString = _config.GetValue<string>("MediaStorage:ConnectionString");
-            if (connectionString == null)
-                throw new Exception("No connection string configured for media storage.");
+            if (connectionString != null)
+            {
+                var containerName = _config.GetValue<string>("MediaStorage:ContainerName");
+                if (containerName == null)
+                    throw new Exception("No connection string configured for media storage.");
 
-            var containerName = _config.GetValue<string>("MediaStorage:ContainerName");
-            if (containerName == null)
-                throw new Exception("No connection string configured for media storage.");
+                return new BlobContainerClient(connectionString, containerName);
+            }
+            
+            var containerUri = _config.GetValue<string>("MediaStorage:ContainerUri");
+            if (containerUri != null)
+                return new BlobContainerClient(new Uri(containerUri), new DefaultAzureCredential());
 
-            var container = new BlobContainerClient(connectionString, containerName);
-            return container;
+            throw new Exception("No connection string or container uri configured for media storage.");
+        
         }
 
     }

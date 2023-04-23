@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.8.2" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
     <PackageReference Include="FFXIVVenues.VenueModels" Version="11.1.0" />
     <PackageReference Include="LiteDb" Version="5.0.11" />
