@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FFXIVVenues.Api.Helpers;
+using FFXIVVenues.Api.InternalModel.Marshalling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,8 @@ namespace FFXIVVenues.Api
             services.AddSingleton(venueCache);
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
             services.AddSingleton<IChangeBroker, ChangeBroker>();
+            services.AddSingleton<ISplashUriBuilder, SplashUriBuilder>();
+            services.AddSingleton<IModelMarshaller, ModelMarshaller>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
             services.AddControllers();
             services.AddHttpContextAccessor();

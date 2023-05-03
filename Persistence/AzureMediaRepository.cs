@@ -29,12 +29,6 @@ namespace FFXIVVenues.Api.Persistence
             return (response.Value.Content, response.Value.Details.ContentType);
         }
 
-        public Uri GetUri(string key)
-        {
-            var template = this._config.GetValue<string>("MediaStorage:BlobUriTemplate");
-            return template == null ? null : new Uri(template.Replace("{key}", key));
-        }
-
         public async Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken)
         {
             var key = IdHelper.GenerateId();
@@ -71,7 +65,6 @@ namespace FFXIVVenues.Api.Persistence
                 return new BlobContainerClient(new Uri(containerUri), new DefaultAzureCredential());
 
             throw new Exception("No connection string or container uri configured for media storage.");
-        
         }
 
     }

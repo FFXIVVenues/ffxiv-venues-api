@@ -12,6 +12,7 @@ using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.Reflection;
 using FFXIVVenues.Api.Helpers;
+using FFXIVVenues.Api.InternalModel.Marshalling;
 using FFXIVVenues.VenueModels;
 
 namespace FFXIVVenues.Api.Controllers
@@ -22,12 +23,14 @@ namespace FFXIVVenues.Api.Controllers
     {
 
         private readonly IObjectRepository _repository;
+        private readonly IModelMarshaller _modelMarshaller;
         private readonly IMediaRepository _mediaManager;
         private readonly IAuthorizationManager _authorizationManager;
         private readonly IChangeBroker _changeBroker;
         private readonly RollingCache<IEnumerable<Venue>> _cache;
 
         public VenueController(IObjectRepository repository,
+                               IModelMarshaller modelMarshaller,
                                IMediaRepository mediaManager,
                                IAuthorizationManager authorizationManager,
                                IChangeBroker changeBroker, 
@@ -35,12 +38,14 @@ namespace FFXIVVenues.Api.Controllers
         {
             this._repository = repository;
             this._mediaManager = mediaManager;
+            this._modelMarshaller = modelMarshaller;
             this._authorizationManager = authorizationManager;
             this._changeBroker = changeBroker;
             this._cache = cache;
         }
 
         [HttpGet]
+        // todo: Fix this insanity
         public IEnumerable<VenueModels.Venue> Get(string search = null,
                                                     string manager = null,
                                                     string dataCenter = null,
@@ -73,14 +78,13 @@ namespace FFXIVVenues.Api.Controllers
             if (open != null)
                 query = query.Where(v => v.IsOpen() == open);
 
-            query = query.ToList()
+            var results  = query.ToList()
                 .Where(v => v.Approved && v.HiddenUntil < DateTime.UtcNow || this._authorizationManager.Check().Can(Operation.ReadHidden, v))
-                .AsQueryable();
+                .Select(this._modelMarshaller.MarshalAsPublicModel)
+                .ToList();
             
-            var result = query.Select(v => v.ToPublicModel(_mediaManager));
-            this._cache.Set(cacheKey, result);
-            
-            return result;
+            this._cache.Set(cacheKey, results);
+            return results;
         }
 
         [HttpGet("{id}")]
@@ -91,8 +95,15 @@ namespace FFXIVVenues.Api.Controllers
                 return NotFound();
             
             if (recordView == null || recordView == true)
-                _repository.Upsert(new InternalModel.ViewRecord(id));
-            return venue.ToPublicModel(_mediaManager);
+                try
+                {
+                    this._repository.Upsert(new InternalModel.ViewRecord(id));
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLineAsync(e.ToString());
+                }
+            return this._modelMarshaller.MarshalAsPublicModel(venue);
         }
 
         [HttpPut("{id}")]
@@ -108,21 +119,22 @@ namespace FFXIVVenues.Api.Controllers
                     return Unauthorized();
 
                 var owningKey = _authorizationManager.GetKey();
-                this._repository.Upsert(InternalModel.Venue.CreateFromPublicModel(venue, owningKey));
+                var newInternalVenue = this._modelMarshaller.MarshalAsInternalModel(venue, owningKey);
+                this._repository.Upsert(newInternalVenue);
                 this._cache.Clear();
-                return Ok(venue);
+                return Ok(this._modelMarshaller.MarshalAsPublicModel(newInternalVenue));
             }
 
             if (_authorizationManager.Check().CanNot(Operation.Update, existingVenue))
                 return Unauthorized();
 
-            var repoVenue = existingVenue.UpdateFromPublicModel(venue);
-            _repository.Upsert(repoVenue);
+            var internalModel = this._modelMarshaller.MarshalAsInternalModel(existingVenue, venue);
+            this._repository.Upsert(internalModel);
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
 
             this._cache.Clear();
             
-            return Ok(repoVenue.ToPublicModel(_mediaManager));
+            return Ok(this._modelMarshaller.MarshalAsPublicModel(internalModel));
         }
 
         [HttpDelete("{id}")]
@@ -140,10 +152,9 @@ namespace FFXIVVenues.Api.Controllers
             
             this._cache.Clear();
             
-            return Ok(venue.ToPublicModel(_mediaManager));
+            return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
         }
-
-
+        
         [HttpGet("{id}/approved")]
         public ActionResult Approved(string id)
         {
@@ -155,7 +166,6 @@ namespace FFXIVVenues.Api.Controllers
                 return Unauthorized();
 
             this._cache.Clear();
-            
             return Ok(venue.Approved);
         }
 
@@ -176,10 +186,11 @@ namespace FFXIVVenues.Api.Controllers
                 this._cache.Clear();
                 this._changeBroker.Invoke(approved ? ObservableOperation.Create : ObservableOperation.Delete, venue);
             }
-            return Ok(venue.ToPublicModel(_mediaManager));
+            return Ok(venue.Approved);
         }
 
         private static PropertyInfo _addedField = typeof(InternalModel.Venue).GetProperty("Added");
+
         [HttpPut("{id}/added")]
         public ActionResult Added(string id, [FromBody] DateTime added)
         {
@@ -195,7 +206,7 @@ namespace FFXIVVenues.Api.Controllers
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             _repository.Upsert(venue);
             this._cache.Clear();
-            return Ok(venue.ToPublicModel(_mediaManager));
+            return Ok(venue.Added);
         }
 
         [HttpPut("{id}/hiddenUntil")]
@@ -213,7 +224,7 @@ namespace FFXIVVenues.Api.Controllers
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
             this._cache.Clear();
-            return Ok(venue.ToPublicModel(_mediaManager));
+            return Ok(venue.HiddenUntil);
         }
 
         [HttpPost("{id}/open")]
@@ -241,7 +252,7 @@ namespace FFXIVVenues.Api.Controllers
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
             this._cache.Clear();
-            return Ok(venue.ToPublicModel(_mediaManager));
+            return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
         }
 
         [HttpPost("{id}/close")]
@@ -267,7 +278,7 @@ namespace FFXIVVenues.Api.Controllers
             this._changeBroker.Invoke(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
             this._cache.Clear();
-            return Ok(venue.ToPublicModel(_mediaManager));
+            return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
         }
 
         [HttpPut("observe")]

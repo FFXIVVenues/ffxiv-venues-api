@@ -46,12 +46,6 @@ namespace FFXIVVenues.Api.Persistence
             return Task.FromResult((File.OpenRead(DEFAULT_MEDIA_LOCATION + key) as Stream, this._contentTypes[key]));
         }
 
-        public Uri GetUri(string key)
-        {
-            var template = this._config.GetValue<string>("MediaStorage:BlobUriTemplate");
-            return template == null ? null : new Uri(template.Replace("{key}", key));
-        }
-
         public async Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken)
         {
             var key = IdHelper.GenerateId();
