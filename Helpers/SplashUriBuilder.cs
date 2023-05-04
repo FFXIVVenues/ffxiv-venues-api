@@ -16,6 +16,6 @@ class SplashUriBuilder : ISplashUriBuilder
     public Uri GetSplashUri(Venue venue)
     {
         var template = this._config.GetValue<string>("MediaStorage:BlobUriTemplate");
-        return template == null ? null : new Uri(template.Replace("venueId", venue.Id).Replace("{bannerKey}", venue.Banner));
+        return template == null ? null : new Uri(template.Replace("{venueId}", venue.Id).Replace("{bannerKey}", venue.Banner));
     }
 }
