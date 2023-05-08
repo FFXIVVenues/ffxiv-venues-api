@@ -48,5 +48,4 @@ namespace FFXIVVenues.Api.Security
 
     }
 
-
 }

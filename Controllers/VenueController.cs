@@ -281,23 +281,34 @@ namespace FFXIVVenues.Api.Controllers
             return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
         }
 
-        [HttpPut("observe")]
-        public async Task<ActionResult> Observe([FromBody] Observer observer)
+        [HttpGet("observe")]
+        public async Task<ActionResult> Observe()
         {
-            if (this.ControllerContext.HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                var webSocket = await this.ControllerContext.HttpContext.WebSockets.AcceptWebSocketAsync();
+            if (!this.HttpContext.WebSockets.IsWebSocketRequest)
+                return this.BadRequest();
 
-                Action removeObserver = null;
-                observer.ObserverAction = async (op, venue) =>
+            var webSocket = await this.ControllerContext.HttpContext.WebSockets.AcceptWebSocketAsync();
+
+            Action removeExistingObserver = null;
+            
+            var buffer = new byte[1024 * 4];
+            while (true)
+            {
+                var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.CloseStatus.HasValue)
                 {
-                    if (webSocket.State == WebSocketState.Closed ||
-                        webSocket.State == WebSocketState.Aborted) 
-                    {
-                        removeObserver();
-                        return;
-                    }
-                    
+                    removeExistingObserver?.Invoke();
+                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                    break;
+                }
+
+                var message = Encoding.UTF8.GetString(new ReadOnlySpan<byte>(buffer, 0, result.Count));
+                var newObserver = JsonSerializer.Deserialize<Observer>(message);
+                if (newObserver == null)
+                    continue;
+                
+                newObserver.ObserverAction = async (op, venue) =>
+                {
                     var change = new
                     {
                         operation = op.ToString(),
@@ -306,24 +317,11 @@ namespace FFXIVVenues.Api.Controllers
                     var payload = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(change));
                     await webSocket.SendAsync(payload, WebSocketMessageType.Text, true, CancellationToken.None);
                 };
-                removeObserver = this._changeBroker.Observe(observer);
-
-                var buffer = new byte[1024 * 4];
-                while (true)
-                {
-                    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                    if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        removeObserver();
-                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
-                        break;
-                    }
-                }
-
-                return this.NoContent();
+                removeExistingObserver?.Invoke();
+                removeExistingObserver = this._changeBroker.Observe(newObserver);
             }
-            else
-                return this.BadRequest();
+
+            return this.NoContent();
         }
 
     }

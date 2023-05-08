@@ -54,8 +54,6 @@ namespace FFXIVVenues.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var authorizationKey = _configuration.GetValue<string>("Security:AuthorizationKey");
-
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
@@ -68,20 +66,12 @@ namespace FFXIVVenues.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FFXIV Venues API v1"));
             }
 
-            app.UseCors(policyBuilder => policyBuilder.SetIsOriginAllowed(s => true).AllowCredentials().AllowAnyHeader())
-               .UseRouting();
+            app.UseCors(
+                    pb => pb.SetIsOriginAllowed(s => true).AllowCredentials().AllowAnyHeader())
+                .UseWebSockets()
+                .UseRouting()
+                .UseEndpoints(endpoints => endpoints.MapControllers());
 
-            if (!string.IsNullOrEmpty(authorizationKey))
-            {
-                app.Use((context, n) =>
-                {
-                    if (context.Request.Headers["Authorization"] == $"Bearer {authorizationKey}")
-                        context.Items.Add("authorized", true);
-                    return n();
-                });
-            }
-
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }
