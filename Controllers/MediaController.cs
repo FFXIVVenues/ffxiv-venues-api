@@ -7,6 +7,7 @@ using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.Api.InternalModel;
 using FFXIVVenues.Api.Observability;
+using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Controllers
 {
@@ -72,7 +73,7 @@ namespace FFXIVVenues.Api.Controllers
             venue.Banner = await _mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
             this._repository.Upsert(venue);
             this._cache.Clear();
-            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
             
             return NoContent();
         }
@@ -97,7 +98,7 @@ namespace FFXIVVenues.Api.Controllers
             venue.Banner = null;
             _repository.Upsert(venue);
             this._cache.Clear();
-            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
 
             return NoContent();
         }

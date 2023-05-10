@@ -14,6 +14,8 @@ using System.Reflection;
 using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.Api.InternalModel.Marshalling;
 using FFXIVVenues.VenueModels;
+using FFXIVVenues.VenueModels.Observability;
+using Microsoft.AspNetCore.Http;
 
 namespace FFXIVVenues.Api.Controllers
 {
@@ -121,6 +123,8 @@ namespace FFXIVVenues.Api.Controllers
                 var owningKey = _authorizationManager.GetKey();
                 var newInternalVenue = this._modelMarshaller.MarshalAsInternalModel(venue, owningKey);
                 this._repository.Upsert(newInternalVenue);
+                this._changeBroker.Queue(ObservableOperation.Create, venue);
+
                 this._cache.Clear();
                 return Ok(this._modelMarshaller.MarshalAsPublicModel(newInternalVenue));
             }
@@ -130,7 +134,7 @@ namespace FFXIVVenues.Api.Controllers
 
             var internalModel = this._modelMarshaller.MarshalAsInternalModel(existingVenue, venue);
             this._repository.Upsert(internalModel);
-            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
 
             this._cache.Clear();
             
@@ -148,7 +152,7 @@ namespace FFXIVVenues.Api.Controllers
             if (venue.Banner != null)
                 _mediaManager.Delete(venue.Banner);
             _repository.Delete<InternalModel.Venue>(id);
-            this._changeBroker.Invoke(ObservableOperation.Delete, venue);
+            this._changeBroker.Queue(ObservableOperation.Delete, venue);
             
             this._cache.Clear();
             
@@ -184,7 +188,7 @@ namespace FFXIVVenues.Api.Controllers
                 venue.Approved = approved;
                 this._repository.Upsert(venue);
                 this._cache.Clear();
-                this._changeBroker.Invoke(approved ? ObservableOperation.Create : ObservableOperation.Delete, venue);
+                this._changeBroker.Queue(ObservableOperation.Update, venue);
             }
             return Ok(venue.Approved);
         }
@@ -203,7 +207,7 @@ namespace FFXIVVenues.Api.Controllers
 
             _addedField.SetValue(venue, added);
 
-            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
             _repository.Upsert(venue);
             this._cache.Clear();
             return Ok(venue.Added);
@@ -221,7 +225,7 @@ namespace FFXIVVenues.Api.Controllers
 
             venue.HiddenUntil = until;
 
-            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
             this._cache.Clear();
             return Ok(venue.HiddenUntil);
@@ -249,7 +253,7 @@ namespace FFXIVVenues.Api.Controllers
             });
             venue.OpenOverrides = newOverrides;
 
-            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
             this._cache.Clear();
             return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
@@ -275,17 +279,20 @@ namespace FFXIVVenues.Api.Controllers
             });
             venue.OpenOverrides = newOverrides;
 
-            this._changeBroker.Invoke(ObservableOperation.Update, venue);
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
             this._repository.Upsert(venue);
             this._cache.Clear();
             return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
         }
 
         [HttpGet("observe")]
-        public async Task<ActionResult> Observe()
+        public async Task Observe()
         {
             if (!this.HttpContext.WebSockets.IsWebSocketRequest)
-                return this.BadRequest();
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                return;
+            }
 
             var webSocket = await this.ControllerContext.HttpContext.WebSockets.AcceptWebSocketAsync();
 
@@ -294,7 +301,16 @@ namespace FFXIVVenues.Api.Controllers
             var buffer = new byte[1024 * 4];
             while (true)
             {
-                var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                WebSocketReceiveResult result = null;
+                try
+                {
+                    result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                }
+                catch (WebSocketException)
+                {
+                    removeExistingObserver?.Invoke();
+                    return;
+                }
                 if (result.CloseStatus.HasValue)
                 {
                     removeExistingObserver?.Invoke();
@@ -303,25 +319,19 @@ namespace FFXIVVenues.Api.Controllers
                 }
 
                 var message = Encoding.UTF8.GetString(new ReadOnlySpan<byte>(buffer, 0, result.Count));
-                var newObserver = JsonSerializer.Deserialize<Observer>(message);
-                if (newObserver == null)
+                var observer = JsonSerializer.Deserialize<Observer>(message);
+                if (observer == null)
                     continue;
-                
-                newObserver.ObserverAction = async (op, venue) =>
+
+                observer.ObserverAction = (op, venue) =>
                 {
-                    var change = new
-                    {
-                        operation = op.ToString(),
-                        subject = venue.Id
-                    };
+                    var change = VenueObservation.FromVenue(op, venue);
                     var payload = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(change));
-                    await webSocket.SendAsync(payload, WebSocketMessageType.Text, true, CancellationToken.None);
+                    return webSocket.SendAsync(payload, WebSocketMessageType.Text, true, CancellationToken.None);
                 };
                 removeExistingObserver?.Invoke();
-                removeExistingObserver = this._changeBroker.Observe(newObserver);
+                removeExistingObserver = this._changeBroker.Observe(observer, InvocationKind.Delayed);
             }
-
-            return this.NoContent();
         }
 
     }
