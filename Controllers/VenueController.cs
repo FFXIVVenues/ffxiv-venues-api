@@ -53,6 +53,7 @@ namespace FFXIVVenues.Api.Controllers
                                                     string dataCenter = null,
                                                     string world = null,
                                                     string tags = null,
+                                                    bool? hasBanner = null,
                                                     bool? approved = null,
                                                     bool? open = null)
         {
@@ -77,6 +78,8 @@ namespace FFXIVVenues.Api.Controllers
             }
             if (approved != null)
                 query = query.Where(v => v.Approved == approved);
+            if (hasBanner != null)
+                query = query.Where(v => hasBanner.Value == (v.Banner != null));
             if (open != null)
                 query = query.Where(v => v.IsOpen() == open);
 
