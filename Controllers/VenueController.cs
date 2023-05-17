@@ -57,6 +57,11 @@ namespace FFXIVVenues.Api.Controllers
                                                     bool? approved = null,
                                                     bool? open = null)
         {
+            search = search?.Trim();
+            manager = manager?.Trim();
+            dataCenter = dataCenter?.Trim();
+            world = world?.Trim();
+            tags = tags?.Trim();
             var cacheKey = $"*|{search}|{manager}|{dataCenter}|{world}|{tags}|{hasBanner}|{approved}|{open}";
             var cache = this._cache.Get(cacheKey);
             if (cache != null)
