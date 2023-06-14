@@ -4,9 +4,8 @@ namespace FFXIVVenues.Api.Security
 {
     public interface IAuthorizationCheck
     {
-        bool CanNot(Operation op, IEntity entity = null);
+        bool CanNot(Operation op, ISecurityScoped entity = null);
 
-        bool Can(Operation op, IEntity entity = null);
-
+        bool Can(Operation op, ISecurityScoped entity = null);
     }
 }

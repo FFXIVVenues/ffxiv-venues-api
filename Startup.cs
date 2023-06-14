@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using AutoMapper;
 using FFXIVVenues.Api.Helpers;
-using FFXIVVenues.Api.InternalModel.Marshalling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Observability;
+using FFXIVVenues.Api.PersistenceModels.Mapping;
 using FFXIVVenues.VenueModels;
 
 namespace FFXIVVenues.Api
@@ -39,10 +40,10 @@ namespace FFXIVVenues.Api
             else
                 services.AddSingleton<IMediaRepository, LocalMediaRepository>();
             services.AddSingleton(venueCache);
+            services.AddSingleton<IMapper>(provider => AutoMapping.GetModelMapper(provider.GetService<ISplashUriMapper>()));
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
             services.AddSingleton<IChangeBroker, ChangeBroker>();
-            services.AddSingleton<ISplashUriBuilder, SplashUriBuilder>();
-            services.AddSingleton<IModelMarshaller, ModelMarshaller>();
+            services.AddSingleton<ISplashUriMapper, SplashUriMapper>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
             services.AddControllers();
             services.AddHttpContextAccessor();
@@ -54,6 +55,7 @@ namespace FFXIVVenues.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 

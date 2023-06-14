@@ -9,9 +9,9 @@ namespace FFXIVVenues.Api.Security
         public AuthorizationCheck(AuthorizationKey _key) =>
             this._key = _key;
 
-        public bool CanNot(Operation op, IEntity entity = null) => !Can(op, entity);
+        public bool CanNot(Operation op, ISecurityScoped entity = null) => !Can(op, entity);
 
-        public bool Can(Operation op, IEntity entity = null)
+        public bool Can(Operation op, ISecurityScoped entity = null)
         {
             if (_key.Scope == "all")
                 return op switch
@@ -34,7 +34,7 @@ namespace FFXIVVenues.Api.Security
             if (op == Operation.Read)
                 return true;
 
-            return entity.OwningKey == _key.Key && op switch
+            return entity.ScopeKey == _key.Key && op switch
             {
                 Operation.Read => true,
                 Operation.ReadHidden => true,

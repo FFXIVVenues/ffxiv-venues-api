@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
@@ -11,11 +12,15 @@ using System.Threading;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.Reflection;
+using AutoMapper;
 using FFXIVVenues.Api.Helpers;
-using FFXIVVenues.Api.InternalModel.Marshalling;
+using FFXIVVenues.Api.PersistenceModels;
+using FFXIVVenues.Api.PersistenceModels.Context;
+using FFXIVVenues.Api.PersistenceModels.Entities;
 using FFXIVVenues.VenueModels;
 using FFXIVVenues.VenueModels.Observability;
 using Microsoft.AspNetCore.Http;
+using VenueObservation = FFXIVVenues.Api.Observability.VenueObservation;
 
 namespace FFXIVVenues.Api.Controllers
 {
@@ -24,23 +29,20 @@ namespace FFXIVVenues.Api.Controllers
     public class VenueController : ControllerBase
     {
 
-        private readonly IObjectRepository _repository;
-        private readonly IModelMarshaller _modelMarshaller;
         private readonly IMediaRepository _mediaManager;
+        private readonly IMapper _modelMapper;
         private readonly IAuthorizationManager _authorizationManager;
         private readonly IChangeBroker _changeBroker;
         private readonly RollingCache<IEnumerable<Venue>> _cache;
 
-        public VenueController(IObjectRepository repository,
-                               IModelMarshaller modelMarshaller,
-                               IMediaRepository mediaManager,
+        public VenueController(IMediaRepository mediaManager,
                                IAuthorizationManager authorizationManager,
+                               IMapper modelMapper,
                                IChangeBroker changeBroker, 
                                RollingCache<IEnumerable<Venue>> cache)
         {
-            this._repository = repository;
             this._mediaManager = mediaManager;
-            this._modelMarshaller = modelMarshaller;
+            this._modelMapper = modelMapper;
             this._authorizationManager = authorizationManager;
             this._changeBroker = changeBroker;
             this._cache = cache;
@@ -61,8 +63,10 @@ namespace FFXIVVenues.Api.Controllers
             var cache = this._cache.Get(cacheKey);
             if (cache != null)
                 return cache;
+
+            using var db = new VenuesContext();
             
-            var query = _repository.GetAll<InternalModel.Venue>();
+            var query = db.Venues.AsQueryable();
             if (search != null)
                 query = query.Where(v => v.Name.ToLower().Contains(search.ToLower()));
             if (manager != null)
@@ -80,13 +84,15 @@ namespace FFXIVVenues.Api.Controllers
                 query = query.Where(v => v.Approved == approved);
             if (hasBanner != null)
                 query = query.Where(v => hasBanner.Value == (v.Banner != null));
-            if (open != null)
-                query = query.Where(v => v.IsOpen() == open);
-
-            var results  = query.ToList()
+            
+            query = query.ToList()
                 .Where(v => v.Approved && v.HiddenUntil < DateTime.UtcNow || this._authorizationManager.Check().Can(Operation.ReadHidden, v))
-                .Select(this._modelMarshaller.MarshalAsPublicModel)
-                .ToList();
+                .AsQueryable();
+
+            var projectedQuery = this._modelMapper.ProjectTo<Venue>(query);
+            if (open != null)
+                projectedQuery = projectedQuery.Where(v => v.IsOpen() == open);
+            var results = projectedQuery.ToList();
             
             this._cache.Set(cacheKey, results);
             return results;
@@ -95,77 +101,88 @@ namespace FFXIVVenues.Api.Controllers
         [HttpGet("{id}")]
         public ActionResult<VenueModels.Venue> GetById(string id, bool? recordView = true)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+            var venue = db.Venues.Find(id);
+            
             if (venue == null || _authorizationManager.Check().CanNot(Operation.ReadHidden, venue) && !venue.Approved)
                 return NotFound();
-            
+
             if (recordView == null || recordView == true)
-                try
-                {
-                    this._repository.Upsert(new InternalModel.ViewRecord(id));
-                }
-                catch (Exception e)
-                {
-                    Console.Error.WriteLineAsync(e.ToString());
-                }
-            return this._modelMarshaller.MarshalAsPublicModel(venue);
+            {
+                db.VenueViews.Add(new VenueView(venue));
+                db.SaveChanges();
+            }
+            
+            return this._modelMapper.Map<VenueModels.Venue>(venue);
         }
 
         [HttpPut("{id}")]
         public ActionResult Put(string id, [FromBody] VenueModels.Venue venue)
         {
+            using var db = new VenuesContext();
+            
             if (venue.Id != id)
                 return BadRequest("Venue ID does not match.");
 
-            var existingVenue = _repository.GetById<InternalModel.Venue>(id);
+            var existingVenue = db.Venues.Find(id);
             if (existingVenue == null)
             {
                 if (_authorizationManager.Check().CanNot(Operation.Create, existingVenue))
                     return Unauthorized();
 
                 var owningKey = _authorizationManager.GetKey();
-                var newInternalVenue = this._modelMarshaller.MarshalAsInternalModel(venue, owningKey);
-                this._repository.Upsert(newInternalVenue);
-                this._changeBroker.Queue(ObservableOperation.Create, venue);
-
+                var newInternalVenue = this._modelMapper.Map<PersistenceModels.Entities.Venues.Venue>(venue);
+                newInternalVenue.ScopeKey = owningKey;
+                db.Venues.Add(newInternalVenue);
+                db.SaveChanges();
+                
+                this._changeBroker.Queue(ObservableOperation.Create, newInternalVenue);
                 this._cache.Clear();
-                return Ok(this._modelMarshaller.MarshalAsPublicModel(newInternalVenue));
+                
+                return Ok(this._modelMapper.Map<VenueModels.Venue>(newInternalVenue));
             }
 
             if (_authorizationManager.Check().CanNot(Operation.Update, existingVenue))
                 return Unauthorized();
 
-            var internalModel = this._modelMarshaller.MarshalAsInternalModel(existingVenue, venue);
-            this._repository.Upsert(internalModel);
-            this._changeBroker.Queue(ObservableOperation.Update, venue);
-
+            this._modelMapper.Map(venue, existingVenue);
+            existingVenue.LastModified = DateTime.UtcNow;
+            db.Venues.Update(existingVenue);
+            db.SaveChanges();
+            
+            this._changeBroker.Queue(ObservableOperation.Update, existingVenue);
             this._cache.Clear();
             
-            return Ok(this._modelMarshaller.MarshalAsPublicModel(internalModel));
+            return Ok(this._modelMapper.Map<Venue>(existingVenue));
         }
 
         [HttpDelete("{id}")]
         public ActionResult<VenueModels.Venue> Delete(string id)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+            
+            var venue = db.Venues.Find(id);
             if (venue == null)
                 return NotFound();
             if (_authorizationManager.Check().CanNot(Operation.Delete, venue))
                 return Unauthorized();
             if (venue.Banner != null)
                 _mediaManager.Delete(venue.Banner);
-            _repository.Delete<InternalModel.Venue>(id);
-            this._changeBroker.Queue(ObservableOperation.Delete, venue);
+            db.Venues.Remove(venue);
+            db.SaveChanges();
             
+            this._changeBroker.Queue(ObservableOperation.Delete, venue);
             this._cache.Clear();
             
-            return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
+            return Ok(this._modelMapper.Map<Venue>(venue));
         }
         
         [HttpGet("{id}/approved")]
         public ActionResult Approved(string id)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+
+            var venue = db.Venues.Find(id);
             if (venue == null)
                 return NotFound();
 
@@ -179,7 +196,9 @@ namespace FFXIVVenues.Api.Controllers
         [HttpPut("{id}/approved")]
         public ActionResult Approved(string id, [FromBody] bool approved)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+            
+            var venue = db.Venues.Find(id);
             if (venue == null)
                 return NotFound();
 
@@ -189,29 +208,34 @@ namespace FFXIVVenues.Api.Controllers
             if (venue.Approved != approved)
             {
                 venue.Approved = approved;
-                this._repository.Upsert(venue);
+                db.Venues.Update(venue);
+                
                 this._cache.Clear();
                 this._changeBroker.Queue(ObservableOperation.Update, venue);
             }
+            
             return Ok(venue.Approved);
         }
 
-        private static PropertyInfo _addedField = typeof(InternalModel.Venue).GetProperty("Added");
+        private static PropertyInfo _addedField = typeof(PersistenceModels.Entities.Venues.Venue).GetProperty("Added");
 
         [HttpPut("{id}/added")]
         public ActionResult Added(string id, [FromBody] DateTime added)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+            
+            var venue = db.Venues.Find(id);
             if (venue == null)
                 return NotFound();
 
             if (_authorizationManager.Check().CanNot(Operation.Approve, venue))
                 return Unauthorized();
 
-            _addedField.SetValue(venue, added);
+            venue.Added = added;
+            db.Venues.Update(venue);
+            db.SaveChanges();
 
             this._changeBroker.Queue(ObservableOperation.Update, venue);
-            _repository.Upsert(venue);
             this._cache.Clear();
             return Ok(venue.Added);
         }
@@ -219,7 +243,9 @@ namespace FFXIVVenues.Api.Controllers
         [HttpPut("{id}/hiddenUntil")]
         public ActionResult HiddenUntil(string id, [FromBody] DateTime until)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+
+            var venue = db.Venues.Find(id);
             if (venue == null)
                 return NotFound();
 
@@ -227,9 +253,10 @@ namespace FFXIVVenues.Api.Controllers
                 return Unauthorized();
 
             venue.HiddenUntil = until;
-
+            db.Venues.Update(venue);
+            db.SaveChanges();
+            
             this._changeBroker.Queue(ObservableOperation.Update, venue);
-            this._repository.Upsert(venue);
             this._cache.Clear();
             return Ok(venue.HiddenUntil);
         }
@@ -237,7 +264,9 @@ namespace FFXIVVenues.Api.Controllers
         [HttpPost("{id}/open")]
         public ActionResult Open(string id, [FromBody] DateTime until)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+
+            var venue = db.Venues.Find(id);
             if (venue == null)
                 return NotFound();
 
@@ -256,16 +285,21 @@ namespace FFXIVVenues.Api.Controllers
             });
             venue.OpenOverrides = newOverrides;
 
+            db.Venues.Update(venue);
+            db.SaveChanges();
+                
             this._changeBroker.Queue(ObservableOperation.Update, venue);
-            this._repository.Upsert(venue);
             this._cache.Clear();
-            return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
+            
+            return Ok(this._modelMapper.Map<Venue>(venue));
         }
 
         [HttpPost("{id}/close")]
         public ActionResult Close(string id, [FromBody] DateTime until)
         {
-            var venue = _repository.GetById<InternalModel.Venue>(id);
+            using var db = new VenuesContext();
+            
+            var venue = db.Venues.Find(id);
             if (venue == null)
                 return NotFound();
 
@@ -282,10 +316,12 @@ namespace FFXIVVenues.Api.Controllers
             });
             venue.OpenOverrides = newOverrides;
 
+            db.Venues.Update(venue);
+            db.SaveChanges();
+            
             this._changeBroker.Queue(ObservableOperation.Update, venue);
-            this._repository.Upsert(venue);
             this._cache.Clear();
-            return Ok(this._modelMarshaller.MarshalAsPublicModel(venue));
+            return Ok(this._modelMapper.Map<Venue>(venue));
         }
 
         [HttpGet("observe")]

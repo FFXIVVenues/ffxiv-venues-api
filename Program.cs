@@ -16,14 +16,13 @@ config.AddJsonFile("appsettings.json", optional: true)
         .AddUserSecrets<Program>()
         .AddCommandLine(args);
 
-if (environment == Environments.Development) 
-    config.AddUserSecrets<Startup>();
-
-await new WebHostBuilder()
-    .UseKestrel()
-    .UseIIS()
-    .UseIISIntegration()
-    .UseConfiguration(config.Build())
+await Host.CreateDefaultBuilder()
+    .ConfigureWebHostDefaults(wb => 
+        wb.UseKestrel()
+            .UseIIS()
+            .UseIISIntegration()
+            .UseConfiguration(config.Build())
+            .UseStartup<Startup>())
     .UseEnvironment(environment)
     .ConfigureLogging((context, logging) =>
     {
@@ -33,6 +32,6 @@ await new WebHostBuilder()
         logging.AddDebug();
         logging.AddEventSourceLogger();
     })
-    .UseStartup<Startup>()
+    
     .Build().RunAsync();
 

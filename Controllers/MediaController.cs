@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Helpers;
-using FFXIVVenues.Api.InternalModel;
 using FFXIVVenues.Api.Observability;
+using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Controllers
