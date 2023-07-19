@@ -1,17 +1,18 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using AutoMapper;
+using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.VenueModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
 [Table("Notices", Schema = nameof(Venues))]
-[AutoMap(typeof(VenueModels.Notice), ReverseMap = true)]
+[PrimaryKey(nameof(VenueId), nameof(Id))]
 public class Notice
 {
-    [Key] [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
+    public string Id { get; set; } = IdHelper.GenerateId(3);
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
     public NoticeType Type { get; set; }

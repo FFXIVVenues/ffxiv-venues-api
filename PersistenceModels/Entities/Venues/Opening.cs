@@ -1,20 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
 [Table("Openings", Schema = nameof(Entities.Venues))]
-[AutoMap(typeof(VenueModels.Opening), ReverseMap = true)]
+[PrimaryKey(nameof(VenueId), nameof(Day), nameof(StartHour), nameof(StartMinute))]
 public class Opening
 {
-    [Key] [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
     public Day Day { get; set; }
-    public Time Start { get; set; }
-    public Time End { get; set; }
+    public ushort StartHour { get; set; }
+    public ushort StartMinute { get; set; }
+    public ushort? EndHour { get; set; }
+    public ushort? EndMinute { get; set; }
+    public string TimeZone { get; set; }
     public virtual Location Location { get; set; }
-    
-    [Required]
     public virtual Venue Venue { get; set; }
 }

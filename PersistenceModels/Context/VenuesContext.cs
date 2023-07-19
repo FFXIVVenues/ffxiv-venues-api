@@ -10,9 +10,12 @@ public class VenuesContext : DbContext
 {
     public DbSet<Venue> Venues { get; set; }
     public DbSet<VenueView> VenueViews { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-        => modelBuilder.HasDefaultSchema("Venues");
+    {
+        modelBuilder.HasDefaultSchema("Venues");
+        base.OnModelCreating(modelBuilder);
+    }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder

@@ -85,17 +85,16 @@ namespace FFXIVVenues.Api.Controllers
             if (hasBanner != null)
                 query = query.Where(v => hasBanner.Value == (v.Banner != null));
             
-            query = query.ToList()
+            var memQuery = query.ToList()
                 .Where(v => v.Approved && v.HiddenUntil < DateTime.UtcNow || this._authorizationManager.Check().Can(Operation.ReadHidden, v))
-                .AsQueryable();
-
-            var projectedQuery = this._modelMapper.ProjectTo<Venue>(query);
-            if (open != null)
-                projectedQuery = projectedQuery.Where(v => v.IsOpen() == open);
-            var results = projectedQuery.ToList();
+                .Select(v => this._modelMapper.Map<Venue>(v));
             
-            this._cache.Set(cacheKey, results);
-            return results;
+            if (open != null)
+                memQuery = memQuery.Where(v => v.IsOpen() == open);
+
+            var result = memQuery.ToList();
+            this._cache.Set(cacheKey, result);
+            return result;
         }
 
         [HttpGet("{id}")]
@@ -124,7 +123,8 @@ namespace FFXIVVenues.Api.Controllers
             if (venue.Id != id)
                 return BadRequest("Venue ID does not match.");
 
-            var existingVenue = db.Venues.Find(id);
+            var existingVenue = db.Venues.Include(v => v.Openings).FirstOrDefault(v => v.Id == id);
+            
             if (existingVenue == null)
             {
                 if (_authorizationManager.Check().CanNot(Operation.Create, existingVenue))

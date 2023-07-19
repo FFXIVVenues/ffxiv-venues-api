@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
 [Owned]
-[AutoMap(typeof(VenueModels.Time), ReverseMap = true)]
 public class Time
 {
     public ushort Hour { get; set; }

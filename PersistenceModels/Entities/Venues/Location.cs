@@ -1,18 +1,15 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using AutoMapper;
+using FFXIVVenues.Api.Helpers;
 
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
 [Table("Locations", Schema = nameof(Entities.Venues))]
-[AutoMap(typeof(VenueModels.Location), ReverseMap = true)]
 public class Location
 {
-    [Key] [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    
-    public string Id { get; set; }
-    
+
+    [Key] public string Id { get; set; } = IdHelper.GenerateId(8);
     [Index("Address")] public string DataCenter { get; set; }
     [Index("Address")] public string World { get; set; }
     [Index("Address")] public string District { get; set; }

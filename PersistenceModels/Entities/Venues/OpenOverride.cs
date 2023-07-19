@@ -1,16 +1,15 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
-[Table("OpenOverrides", Schema = nameof(Entities.Venues))]
-[AutoMap(typeof(VenueModels.OpenOverride), ReverseMap = true)]
+[Table("OpenOverrides", Schema = nameof(Venues))]
+[PrimaryKey(nameof(VenueId), nameof(Start))]
 public class OpenOverride
 {
-    [Key] [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
     public bool Open { get; set; }
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
