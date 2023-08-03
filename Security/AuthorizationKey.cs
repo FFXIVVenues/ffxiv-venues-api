@@ -10,7 +10,7 @@ namespace FFXIVVenues.Api.Security
         public bool Create { get; set; }
         public bool Update { get; set; }
         public bool Delete { get; set; }
-        public bool ReadHidden { get; set; }
+        public bool ReadUnapproved { get; set; }
         public bool Approve { get; set; }
 
     }

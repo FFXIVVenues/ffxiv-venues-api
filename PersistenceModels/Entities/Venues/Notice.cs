@@ -13,8 +13,8 @@ public class Notice
 {
     [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
     public string Id { get; set; } = IdHelper.GenerateId(3);
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
+    public DateTimeOffset Start { get; set; }
+    public DateTimeOffset End { get; set; }
     public NoticeType Type { get; set; }
     public string Message { get; set; }
     

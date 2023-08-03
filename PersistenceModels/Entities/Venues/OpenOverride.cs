@@ -11,8 +11,8 @@ public class OpenOverride
 {
     [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
     public bool Open { get; set; }
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
+    public DateTimeOffset Start { get; set; }
+    public DateTimeOffset End { get; set; }
     
     [Required]
     public virtual Venue Venue { get; set; }

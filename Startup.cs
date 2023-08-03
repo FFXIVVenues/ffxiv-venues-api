@@ -10,8 +10,11 @@ using Microsoft.OpenApi.Models;
 using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Observability;
+using FFXIVVenues.Api.PersistenceModels.Context;
 using FFXIVVenues.Api.PersistenceModels.Mapping;
 using FFXIVVenues.VenueModels;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FFXIVVenues.Api
 {
@@ -29,28 +32,24 @@ namespace FFXIVVenues.Api
         {
             var venueCache = new RollingCache<IEnumerable<Venue>>(3*60*1000, 30*60*1000);
 
-            var connectionString = _configuration.GetValue<string>("Persistence:ConnectionString");
             var mediaStorageProvider = _configuration.GetValue<string>("MediaStorage:Provider");
             var authorizationKeys = new List<AuthorizationKey>();
             _configuration.GetSection("Security:AuthorizationKeys").Bind(authorizationKeys);
 
-            services.AddSingleton<IObjectRepository>(new LiteDbRepository(connectionString));
+            services.AddSingleton<IFFXIVVenuesDbContextFactory, FFXIVVenuesDbContextFactory>();
             if (mediaStorageProvider.ToLower() == "azure")
                 services.AddSingleton<IMediaRepository, AzureMediaRepository>();
             else
                 services.AddSingleton<IMediaRepository, LocalMediaRepository>();
             services.AddSingleton(venueCache);
-            services.AddSingleton<IMapper>(provider => AutoMapping.GetModelMapper(provider.GetService<ISplashUriMapper>()));
+            services.AddSingleton(AutoMapping.GetModelMapper(_configuration));
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
             services.AddSingleton<IChangeBroker, ChangeBroker>();
-            services.AddSingleton<ISplashUriMapper, SplashUriMapper>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
             services.AddControllers();
             services.AddHttpContextAccessor();
             services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FFXIV Venues API", Version = "v1" });
-            });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FFXIV Venues API", Version = "v1" }));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

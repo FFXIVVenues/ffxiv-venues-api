@@ -3,7 +3,6 @@
     public enum Operation
     {
         Read,
-        ReadHidden,
         Approve,
         Create,
         Update,

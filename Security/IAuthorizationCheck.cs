@@ -1,4 +1,5 @@
-﻿using FFXIVVenues.Api.Persistence;
+﻿using System.Linq;
+using FFXIVVenues.Api.Persistence;
 
 namespace FFXIVVenues.Api.Security
 {
@@ -7,5 +8,7 @@ namespace FFXIVVenues.Api.Security
         bool CanNot(Operation op, ISecurityScoped entity = null);
 
         bool Can(Operation op, ISecurityScoped entity = null);
+        
+        IQueryable<T> Can<T>(Operation op, IQueryable<T> queryable) where T : ISecurityScoped;
     }
 }

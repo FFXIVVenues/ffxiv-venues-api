@@ -1,4 +1,7 @@
-﻿using FFXIVVenues.Api.Persistence;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FFXIVVenues.Api.Persistence;
 
 namespace FFXIVVenues.Api.Security
 {
@@ -13,11 +16,22 @@ namespace FFXIVVenues.Api.Security
 
         public bool Can(Operation op, ISecurityScoped entity = null)
         {
-            if (_key.Scope == "all")
+            if (op == Operation.Create && entity != null)
+                throw new InvalidOperationException("Cannot authorise Create permission against an existing item.");
+            
+            if (op == Operation.Create)
+                return _key.Create;
+            
+            if (entity == null)
+                return false;
+            
+            if (op == Operation.Read && entity.Approved)
+                return true;
+            
+            if (_key.Scope == "all" || (_key.Scope == "approved" && entity.Approved))
                 return op switch
                 {
                     Operation.Read => true,
-                    Operation.ReadHidden => _key.ReadHidden,
                     Operation.Approve => _key.Approve,
                     Operation.Create => _key.Create,
                     Operation.Update => _key.Update,
@@ -25,19 +39,9 @@ namespace FFXIVVenues.Api.Security
                     _ => false
                 };
 
-            if (op == Operation.Create)
-                return _key.Create;
-
-            if (entity == null)
-                return false;
-
-            if (op == Operation.Read)
-                return true;
-
             return entity.ScopeKey == _key.Key && op switch
             {
                 Operation.Read => true,
-                Operation.ReadHidden => true,
                 Operation.Approve => _key.Approve,
                 Operation.Create => _key.Create,
                 Operation.Update => _key.Update,
@@ -45,6 +49,37 @@ namespace FFXIVVenues.Api.Security
                 _ => false
             };
         }
+
+        public IQueryable<T> Can<T>(Operation op, IQueryable<T> queryable) where T : ISecurityScoped
+        {
+            if (op == Operation.Create)
+                throw new InvalidOperationException("Cannot items venues on Create permission.");
+            
+            var opAuthorised = op switch
+            {
+                Operation.Read => true,
+                Operation.Approve => _key.Approve,
+                Operation.Create => _key.Create,
+                Operation.Update => _key.Update,
+                Operation.Delete => _key.Delete,
+                _ => false
+            };
+
+            if (!opAuthorised)
+                return new List<T>().AsQueryable();
+
+            if (_key.Scope == "all")
+                return queryable;
+            
+            if (op == Operation.Read || _key.Scope == "approved")
+                return queryable.Where(i => i.Approved || i.ScopeKey == _key.Key);
+            
+            return queryable.Where(i => i.ScopeKey == _key.Key);
+        }
+        
+        
     }
+    
+    
 
 }
