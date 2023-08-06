@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
 namespace FFXIVVenues.Api.Security
 {
@@ -17,7 +19,9 @@ namespace FFXIVVenues.Api.Security
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetKey()
+        public bool IsAuthenticated() => this.GetKeyString() != null;
+        
+        public string GetKeyString()
         {
             var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"] ?? Microsoft.Extensions.Primitives.StringValues.Empty;
             if (!authorizationHeader.Any())
@@ -31,18 +35,19 @@ namespace FFXIVVenues.Api.Security
             return null;
         }
 
-        public IAuthorizationCheck Check(string key = null)
+        public AuthorizationKey GetKey(string key = null)
         {
             if (key == null)
-            {
-                key = GetKey();
+                key = this.GetKeyString();
+            return _authorizationkeys.FirstOrDefault(k => k.Key == key);
+        }
 
-                if (key == null)
-                    return new NonAuthorizationCheck();
-            }
+        public IAuthorizationCheck Check(string key = null)
+        {
+            var authKey = this.GetKey(key);
+            if (key == null)
+                return new NonAuthorizationCheck();
 
-            var authKey = _authorizationkeys.FirstOrDefault(k => k.Key == key);
-            if (authKey == null) return new NonAuthorizationCheck();
             return new AuthorizationCheck(authKey);
         }
 

@@ -1,9 +1,9 @@
-﻿using FFXIVVenues.VenueModels;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Observability;
@@ -12,7 +12,7 @@ public class ChangeBroker : IChangeBroker
 {
     private readonly List<(Observer Observer, InvocationKind invocationKind)> _observers = new();
     private readonly ConcurrentDictionary<string, Timer> _queuedOperationTimers = new();
-    private readonly ConcurrentDictionary<string, (ObservableOperation[] Operations, Venue Venue)> _queuedOperations = new();
+    private readonly ConcurrentDictionary<string, (ObservableOperation[] Operations, PersistenceModels.Entities.Venues.Venue Venue)> _queuedOperations = new();
 
     public Action Observe(Observer observer, InvocationKind invocationKind)
     {

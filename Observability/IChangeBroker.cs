@@ -1,6 +1,7 @@
 ﻿using FFXIVVenues.VenueModels;
 using System;
 using FFXIVVenues.VenueModels.Observability;
+using Venue = FFXIVVenues.Api.PersistenceModels.Entities.Venues.Venue;
 
 namespace FFXIVVenues.Api.Observability
 {
