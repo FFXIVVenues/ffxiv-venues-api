@@ -6,6 +6,7 @@
     <Nullable>disable</Nullable>
     <UserSecretsId>ffxiv-venues-api-secrets</UserSecretsId>
     <LangVersion>11</LangVersion>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
