@@ -1,8 +1,11 @@
 using System;
 using System.Linq;
 using FFXIVVenues.Api;
+using FFXIVVenues.Api.PersistenceModels.Context;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -12,11 +15,11 @@ var environment = args.SkipWhile(s => !string.Equals(s, "--environment", StringC
 
 var config = new ConfigurationBuilder();
 config.AddJsonFile("appsettings.json", optional: true)
-        .AddEnvironmentVariables("FFXIVVENUES_")
+        .AddEnvironmentVariables("FFXIVVENUES_API_")
         .AddUserSecrets<Program>()
         .AddCommandLine(args);
 
-await Host.CreateDefaultBuilder()
+var host = Host.CreateDefaultBuilder()
     .ConfigureWebHostDefaults(wb => 
         wb.UseKestrel()
             .UseIIS()
@@ -32,6 +35,15 @@ await Host.CreateDefaultBuilder()
         logging.AddDebug();
         logging.AddEventSourceLogger();
     })
-    
-    .Build().RunAsync();
+    .Build();
 
+await using (var scope = host.Services.CreateAsyncScope())
+{
+    var dbContextFactory = scope.ServiceProvider.GetService<IFFXIVVenuesDbContextFactory>();
+    await using (var db = dbContextFactory.Create())
+    {
+        await db.Database.MigrateAsync();
+    }
+}
+
+await host.RunAsync();
