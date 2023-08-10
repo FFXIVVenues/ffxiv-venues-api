@@ -6,8 +6,9 @@ RUN apt install -y libcurl4
 RUN apt install -y aspnetcore-runtime-6.0
 RUN apt install -y tzdata
 WORKDIR /app
+ENV ASPNETCORE_URLS=http://0.0.0.0:80
+ENV FFXIV_VENUES_API__HttpsOnly=False
 EXPOSE 80
-EXPOSE 443
 
 FROM ubuntu:latest AS build
 COPY . /src
