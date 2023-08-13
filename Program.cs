@@ -15,7 +15,7 @@ var environment = args.SkipWhile(s => !string.Equals(s, "--environment", StringC
 
 var config = new ConfigurationBuilder();
 config.AddJsonFile("appsettings.json", optional: true)
-        .AddEnvironmentVariables("FFXIV_VENUES_API__")
+        .AddEnvironmentVariables("FFXIV_VENUES_API:")
         .AddUserSecrets<Program>()
         .AddCommandLine(args);
 
