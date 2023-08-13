@@ -42,7 +42,7 @@ namespace FFXIVVenues.Api
             else
                 services.AddSingleton<IMediaRepository, LocalMediaRepository>();
             services.AddSingleton(venueCache);
-            services.AddSingleton(AutoMapping.GetModelMapper(_configuration));
+            services.AddSingleton<IMapFactory>(new MapFactory(_configuration));
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
             services.AddSingleton<IChangeBroker, ChangeBroker>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);

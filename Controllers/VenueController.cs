@@ -17,6 +17,7 @@ using FFXIVVenues.Api.Observability;
 using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.Api.PersistenceModels.Context;
 using FFXIVVenues.Api.PersistenceModels.Entities;
+using FFXIVVenues.Api.PersistenceModels.Mapping;
 using FFXIVVenues.VenueModels.Observability;
 using Microsoft.AspNetCore.Http;
 
@@ -32,6 +33,7 @@ namespace FFXIVVenues.Api.Controllers
 
         private readonly IMediaRepository _mediaManager;
         private readonly IMapper _modelMapper;
+        private readonly IMapper _modelProjector;
         private readonly IAuthorizationManager _authorizationManager;
         private readonly IChangeBroker _changeBroker;
         private readonly FFXIVVenuesDbContext _db;
@@ -39,13 +41,14 @@ namespace FFXIVVenues.Api.Controllers
 
         public VenueController(IMediaRepository mediaManager,
                                IAuthorizationManager authorizationManager,
-                               IMapper modelMapper,
+                               IMapFactory mapFactory,
                                IChangeBroker changeBroker, 
                                IFFXIVVenuesDbContextFactory dbContextFactory,
                                RollingCache<IEnumerable<Dto.Venue>> cache)
         {
             this._mediaManager = mediaManager;
-            this._modelMapper = modelMapper;
+            this._modelMapper = mapFactory.GetModelMapper();
+            this._modelProjector = mapFactory.GetModelProjector();
             this._authorizationManager = authorizationManager;
             this._changeBroker = changeBroker;
             this._db = dbContextFactory.Create();
@@ -58,7 +61,7 @@ namespace FFXIVVenues.Api.Controllers
             var query = this._db.Venues.AsQueryable();
             query = queryArgs.ApplyDomainQueryArgs(query);
             query = this._authorizationManager.Check().Can(Operation.Read, query);
-            var dtos = this._modelMapper.ProjectTo<Dto.Venue>(query);
+            var dtos = this._modelProjector.ProjectTo<Dto.Venue>(query);
             return queryArgs.ApplyDtoQueryArgs(dtos);
         }
 

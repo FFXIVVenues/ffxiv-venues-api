@@ -45,7 +45,7 @@ namespace FFXIVVenues.Api.Security
         public IAuthorizationCheck Check(string key = null)
         {
             var authKey = this.GetKey(key);
-            if (key == null)
+            if (authKey == null)
                 return new NonAuthorizationCheck();
 
             return new AuthorizationCheck(authKey);

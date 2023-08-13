@@ -5,14 +5,16 @@ using Microsoft.Extensions.Configuration;
 
 namespace FFXIVVenues.Api.PersistenceModels.Mapping;
 
-public static class AutoMapping
+public class MapFactory : IMapFactory
 {
+    private readonly MapperConfiguration _mappingConfiguration;
+    private readonly MapperConfiguration _projectionConfiguration;
 
-    public static IMapper GetModelMapper(IConfiguration config)
+    public MapFactory(IConfiguration config)
     {
-        var configuration = new MapperConfiguration(cfg =>
+        var blobUriTemplate = config.GetValue<string>("MediaStorage:BlobUriTemplate");
+        this._mappingConfiguration = new MapperConfiguration(cfg =>
         {
-            var blobUriTemplate = config.GetValue<string>("MediaStorage:BlobUriTemplate");
             cfg.CreateMap<Opening, VenueModels.Opening>()
                 .ForMember(o => o.Start, x => x.MapFrom(s =>
                     new VenueModels.Time { Hour = s.StartHour, Minute = s.StartMinute, TimeZone = s.TimeZone }))
@@ -38,8 +40,11 @@ public static class AutoMapping
                 .ForMember(d => d.LastModified, ex => ex.Ignore())
                 .ForMember(d => d.Approved, ex => ex.Ignore())
                 .ForMember(d => d.ScopeKey, ex => ex.Ignore());
-            
-            cfg.CreateProjection<Venue, VenueModels.Venue>()
+        });
+        
+        this._projectionConfiguration = new MapperConfiguration(cfg =>
+        {
+           cfg.CreateProjection<Venue, VenueModels.Venue>()
                 .ForMember(dto => dto.BannerUri, conf => conf.MapFrom(o => 
                     o.Banner != null 
                         ? new Uri(blobUriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner)) 
@@ -55,7 +60,12 @@ public static class AutoMapping
             cfg.CreateProjection<Notice, VenueModels.Notice>();
             cfg.CreateProjection<OpenOverride, VenueModels.OpenOverride>();
         });
-        return configuration.CreateMapper();
     }
+
+    public IMapper GetModelMapper() =>
+        this._mappingConfiguration.CreateMapper();
+    
+    public IMapper GetModelProjector() =>
+        this._projectionConfiguration.CreateMapper();
     
 }
