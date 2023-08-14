@@ -22,7 +22,7 @@ namespace FFXIVVenues.Api.Persistence
         public LocalMediaRepository(IConfiguration config)
         {
             this._config = config;
-            this._mediaLocation = _config.GetValue("ConnectionString", DEFAULT_MEDIA_LOCATION);
+            this._mediaLocation = _config.GetValue("MediaStorage:FilePath", DEFAULT_MEDIA_LOCATION);
             if (!this._mediaLocation.EndsWith('/'))
                 this._mediaLocation += '/';
             Directory.CreateDirectory(this._mediaLocation);
