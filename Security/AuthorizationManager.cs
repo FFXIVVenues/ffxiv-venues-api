@@ -26,14 +26,12 @@ namespace FFXIVVenues.Api.Security
         public string GetKeyString()
         {
             var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"] ?? string.Empty;
-            Console.WriteLine($"Authorization header is {authorizationHeader}");
             if (!authorizationHeader.Any())
                 return null;
 
             
             var parsed = AuthenticationHeaderValue.TryParse(authorizationHeader.First(), out var authenticationHeader);
 
-            Console.WriteLine($"Authentication header value is {authenticationHeader}");
             if (parsed && authenticationHeader != null)
                 return authenticationHeader.Parameter;
 
@@ -43,25 +41,15 @@ namespace FFXIVVenues.Api.Security
         public AuthorizationKey GetKey(string key = null)
         {
             if (key == null)
-            {
-                Console.WriteLine($"Key given is null; fetching key from header;");
                 key = this.GetKeyString();
-            }
-            Console.WriteLine($"Searching for auth key for {key}");
             return _authorizationkeys.FirstOrDefault(k => k.Key == key);
         }
 
         public IAuthorizationCheck Check(string key = null)
         {
-            Console.WriteLine($"Check requested for key {key}");
             var authKey = this.GetKey(key);
             if (authKey == null)
-            {
-                Console.WriteLine($"Null auth key; return NonAuthCheck object");
                 return new NonAuthorizationCheck();
-            }
-
-            Console.WriteLine($"Auth key found; returning {JsonSerializer.Serialize(authKey)}");
             return new AuthorizationCheck(authKey);
         }
 
