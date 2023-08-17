@@ -158,9 +158,9 @@ namespace FFXIVVenues.Api.Controllers
         }
 
         [HttpPut("{id}/approved")]
-        public ActionResult Approved(string id, [FromBody] bool approved)
+        public async Task<ActionResult> Approved(string id, [FromBody] bool approved)
         {
-            var venue = this._db.Venues.Find(id);
+            var venue = await this._db.Venues.FindAsync(id);
             if (venue == null)
                 return NotFound();
 
@@ -171,6 +171,7 @@ namespace FFXIVVenues.Api.Controllers
             {
                 venue.Approved = approved;
                 this._db.Venues.Update(venue);
+                await this._db.SaveChangesAsync();
                 
                 this._cache.Clear();
                 this._changeBroker.Queue(ObservableOperation.Update, venue);
