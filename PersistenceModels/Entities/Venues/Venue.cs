@@ -29,6 +29,7 @@ public class Venue : ISecurityScoped
     public virtual List<string> Tags { get; set; } = new ();
     public string MareCode { get; set; }
     public string MarePassword { get; set; }
+    public DateTimeOffset? Deleted { get; set; }
     public bool Approved { get; set; }
     public string ScopeKey { get; set; }
 

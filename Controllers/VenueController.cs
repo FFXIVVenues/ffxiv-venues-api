@@ -60,6 +60,7 @@ namespace FFXIVVenues.Api.Controllers
         {
             var query = this._db.Venues.AsQueryable();
             query = queryArgs.ApplyDomainQueryArgs(query);
+            query = query.Where(v => v.Deleted == null);
             query = this._authorizationManager.Check().Can(Operation.Read, query);
             var dtos = this._modelProjector.ProjectTo<Dto.Venue>(query);
             return queryArgs.ApplyDtoQueryArgs(dtos);
@@ -69,7 +70,7 @@ namespace FFXIVVenues.Api.Controllers
         public ActionResult<VenueModels.Venue> GetById(string id, bool? recordView = true)
         {
             var venue = this._db.Venues.Find(id);
-            if (venue == null || _authorizationManager.Check().CanNot(Operation.Read, venue))
+            if (venue == null || venue.Deleted != null || _authorizationManager.Check().CanNot(Operation.Read, venue))
                 return NotFound();
 
             if (recordView == null || recordView == true)
@@ -109,6 +110,9 @@ namespace FFXIVVenues.Api.Controllers
             if (_authorizationManager.Check().CanNot(Operation.Update, existingVenue))
                 return Unauthorized();
 
+            if (existingVenue.Deleted != null)
+                return Unauthorized("Cannot PUT to a deleted venue.");
+
             this._modelMapper.Map(venue, existingVenue);
             existingVenue.LastModified = DateTime.UtcNow;
             this._db.Venues.Update(existingVenue);
@@ -123,16 +127,18 @@ namespace FFXIVVenues.Api.Controllers
         [HttpDelete("{id}")]
         public ActionResult<VenueModels.Venue> Delete(string id)
         {
-            
-            
             var venue = this._db.Venues.Find(id);
-            if (venue == null)
+            if (venue == null || venue.Deleted != null)
                 return NotFound();
             if (_authorizationManager.Check().CanNot(Operation.Delete, venue))
                 return Unauthorized();
             if (venue.Banner != null)
+            {
                 _mediaManager.Delete(venue.Banner);
-            this._db.Venues.Remove(venue);
+                venue.Banner = null;
+            }
+            venue.Deleted = DateTimeOffset.UtcNow;
+            this._db.Venues.Update(venue);
             this._db.SaveChanges();
             
             this._changeBroker.Queue(ObservableOperation.Delete, venue);
@@ -144,10 +150,8 @@ namespace FFXIVVenues.Api.Controllers
         [HttpGet("{id}/approved")]
         public ActionResult Approved(string id)
         {
-            
-
             var venue = this._db.Venues.Find(id);
-            if (venue == null)
+            if (venue == null || venue.Deleted != null)
                 return NotFound();
 
             if (_authorizationManager.Check().CanNot(Operation.Approve, venue))
@@ -161,7 +165,7 @@ namespace FFXIVVenues.Api.Controllers
         public async Task<ActionResult> Approved(string id, [FromBody] bool approved)
         {
             var venue = await this._db.Venues.FindAsync(id);
-            if (venue == null)
+            if (venue == null || venue.Deleted != null)
                 return NotFound();
 
             if (_authorizationManager.Check().CanNot(Operation.Approve, venue))
@@ -188,7 +192,7 @@ namespace FFXIVVenues.Api.Controllers
             
             
             var venue = this._db.Venues.Find(id);
-            if (venue == null)
+            if (venue == null || venue.Deleted != null)
                 return NotFound();
 
             if (_authorizationManager.Check().CanNot(Operation.Approve, venue))
@@ -206,10 +210,8 @@ namespace FFXIVVenues.Api.Controllers
         [HttpPost("{id}/open")]
         public ActionResult Open(string id, [FromBody] DateTime until)
         {
-            
-
             var venue = this._db.Venues.Find(id);
-            if (venue == null)
+            if (venue == null || venue.Deleted != null)
                 return NotFound();
 
             if (_authorizationManager.Check().CanNot(Operation.Update, venue))
@@ -239,10 +241,8 @@ namespace FFXIVVenues.Api.Controllers
         [HttpPost("{id}/close")]
         public ActionResult Close(string id, [FromBody] DateTime until)
         {
-            
-            
             var venue = this._db.Venues.Find(id);
-            if (venue == null)
+            if (venue == null || venue.Deleted != null)
                 return NotFound();
 
             if (_authorizationManager.Check().CanNot(Operation.Update, venue)) 
