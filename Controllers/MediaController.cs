@@ -73,6 +73,7 @@ namespace FFXIVVenues.Api.Controllers
                 await _mediaManager.Delete(venue.Banner);
 
             venue.Banner = await _mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
+            venue.LastModified = DateTimeOffset.UtcNow;
             this._db.Venues.Update(venue);
             await this._db.SaveChangesAsync();
             

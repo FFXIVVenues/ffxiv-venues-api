@@ -114,7 +114,7 @@ namespace FFXIVVenues.Api.Controllers
                 return Unauthorized("Cannot PUT to a deleted venue.");
 
             this._modelMapper.Map(venue, existingVenue);
-            existingVenue.LastModified = DateTime.UtcNow;
+            existingVenue.LastModified = DateTimeOffset.UtcNow;
             this._db.Venues.Update(existingVenue);
             await this._db.SaveChangesAsync();
             
