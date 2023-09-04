@@ -8,22 +8,25 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Sentry;
 
 var environment = args.SkipWhile(s => !string.Equals(s, "--environment", StringComparison.OrdinalIgnoreCase)).Skip(1).FirstOrDefault()
-                                ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-                                ?? Environments.Production;
+                  ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+                  ?? Environments.Production;
 
-var config = new ConfigurationBuilder();
-config.AddEnvironmentVariables("FFXIV_VENUES_API:")
-        .AddUserSecrets<Program>()
-        .AddCommandLine(args);
+var config = new ConfigurationBuilder()
+    .AddEnvironmentVariables("FFXIV_VENUES_API:")
+    .AddUserSecrets<Program>()
+    .AddCommandLine(args)
+    .Build();
 
 var host = Host.CreateDefaultBuilder()
     .ConfigureWebHostDefaults(wb => 
-        wb.UseKestrel()
+        wb.UseSentry()
+            .UseKestrel()
             .UseIIS()
             .UseIISIntegration()
-            .UseConfiguration(config.Build())
+            .UseConfiguration(config)
             .UseStartup<Startup>())
     .UseEnvironment(environment)
     .ConfigureLogging((context, logging) =>
