@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.Api.Observability;
 using FFXIVVenues.Api.PersistenceModels.Context;
+using FFXIVVenues.Api.PersistenceModels.Media;
 using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Controllers
@@ -64,7 +64,7 @@ namespace FFXIVVenues.Api.Controllers
                 return Unauthorized();
             if (venue.Deleted != null)
                 return Unauthorized("Cannot PUT to a deleted venue.");
-            if (Request.ContentLength > 1_048_576)
+            if (Request.ContentLength > 10_048_576)
                 return BadRequest();
             if (Request.ContentType?.StartsWith("image/") == false)
                 return BadRequest();

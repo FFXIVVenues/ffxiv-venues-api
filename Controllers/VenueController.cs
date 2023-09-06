@@ -10,14 +10,14 @@ using System.Reflection;
 using AutoMapper;
 using FFXIVVenues.Api.Controllers.ArgModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;    
-using FFXIVVenues.Api.Persistence;
+using Microsoft.EntityFrameworkCore;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Observability;
 using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.Api.PersistenceModels.Context;
 using FFXIVVenues.Api.PersistenceModels.Entities;
 using FFXIVVenues.Api.PersistenceModels.Mapping;
+using FFXIVVenues.Api.PersistenceModels.Media;
 using FFXIVVenues.VenueModels.Observability;
 using Microsoft.AspNetCore.Http;
 

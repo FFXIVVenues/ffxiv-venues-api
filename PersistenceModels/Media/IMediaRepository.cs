@@ -1,14 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FFXIVVenues.Api.Persistence
+namespace FFXIVVenues.Api.PersistenceModels.Media;
+    
+public interface IMediaRepository
 {
-    public interface IMediaRepository
-    {
-        Task Delete(string key);
-        Task<(Stream Stream, string ContentType)> Download(string key, CancellationToken cancellationToken);
-        Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken);
-    }
+    Task Delete(string key);
+    Task<(Stream Stream, string ContentType)> Download(string key, CancellationToken cancellationToken);
+    Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken);
 }

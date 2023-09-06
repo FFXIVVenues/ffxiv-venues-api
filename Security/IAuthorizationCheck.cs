@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using FFXIVVenues.Api.Persistence;
 
 namespace FFXIVVenues.Api.Security
 {

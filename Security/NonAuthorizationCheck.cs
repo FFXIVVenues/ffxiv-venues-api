@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FFXIVVenues.Api.Persistence;
 using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
 namespace FFXIVVenues.Api.Security
