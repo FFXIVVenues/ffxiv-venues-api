@@ -18,6 +18,7 @@ using FFXIVVenues.Api.Security.UserAuthentication;
 using FFXIVVenues.VenueModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using User = Sentry.User;
 
 namespace FFXIVVenues.Api
 {
@@ -62,6 +63,7 @@ namespace FFXIVVenues.Api
             services.AddSingleton<IMapFactory>(new MapFactory(_configuration));
             services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
             services.AddSingleton<IChangeBroker, ChangeBroker>();
+            services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
             services.AddHttpClient();
             services.AddControllers();

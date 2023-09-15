@@ -7,6 +7,7 @@ namespace FFXIVVenues.Api.Security.UserAuthentication;
 
 public class DiscordOptions : OAuthOptions
 {
+    
     public DiscordOptions()
     {
         AuthorizationEndpoint = DiscordDefaults.AuthorizationEndpoint + "?prompt=none";
@@ -19,8 +20,16 @@ public class DiscordOptions : OAuthOptions
         ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "username", ClaimValueTypes.String);
         ClaimActions.MapJsonKey(ClaimTypes.Name, "global_name", ClaimValueTypes.String);
         ClaimActions.MapJsonKey(ClaimTypes.Email, "email", ClaimValueTypes.Email);
-        ClaimActions.MapJsonKey("urn:discord:avatar", "avatar", ClaimValueTypes.String);
-        ClaimActions.MapJsonKey("urn:discord:verified", "verified", ClaimValueTypes.Boolean);
+        ClaimActions.MapJsonKey(DiscordClaimTypes.Avatar, "avatar", ClaimValueTypes.String);
+        ClaimActions.MapJsonKey(DiscordClaimTypes.Banner, "banner", ClaimValueTypes.String);
+        ClaimActions.MapJsonKey(DiscordClaimTypes.Verified, "verified", ClaimValueTypes.Boolean);
     }
         
+}
+
+public class DiscordClaimTypes
+{
+    public const string Avatar = "urn:discord:avatar";
+    public const string Banner = "urn:discord:banner";
+    public const string Verified = "urn:discord:verified";
 }
