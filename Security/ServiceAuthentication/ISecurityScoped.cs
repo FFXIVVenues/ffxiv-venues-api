@@ -1,4 +1,4 @@
-namespace FFXIVVenues.Api.Security
+namespace FFXIVVenues.Api.Security.ServiceAuthentication
 {
     public interface ISecurityScoped
     {

@@ -8,6 +8,7 @@ using FFXIVVenues.Api.Helpers;
 using FFXIVVenues.Api.Observability;
 using FFXIVVenues.Api.PersistenceModels.Context;
 using FFXIVVenues.Api.PersistenceModels.Media;
+using FFXIVVenues.Api.Security.ServiceAuthentication;
 using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Controllers

@@ -18,6 +18,7 @@ using FFXIVVenues.Api.PersistenceModels.Context;
 using FFXIVVenues.Api.PersistenceModels.Entities;
 using FFXIVVenues.Api.PersistenceModels.Mapping;
 using FFXIVVenues.Api.PersistenceModels.Media;
+using FFXIVVenues.Api.Security.ServiceAuthentication;
 using FFXIVVenues.VenueModels.Observability;
 using Microsoft.AspNetCore.Http;
 
