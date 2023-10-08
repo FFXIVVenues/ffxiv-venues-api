@@ -132,11 +132,7 @@ namespace FFXIVVenues.Api.Controllers
                 return NotFound();
             if (_authorizationManager.Check().CanNot(Operation.Delete, venue))
                 return Unauthorized();
-            if (venue.Banner != null)
-            {
-                _mediaManager.Delete(venue.Banner);
-                venue.Banner = null;
-            }
+
             venue.Deleted = DateTimeOffset.UtcNow;
             this._db.Venues.Update(venue);
             this._db.SaveChanges();
