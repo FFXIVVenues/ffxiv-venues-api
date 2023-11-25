@@ -21,8 +21,8 @@ public class Venue : ISecurityScoped
     public Uri Discord { get; set; }
     public bool Hiring { get; set; }
     public bool Sfw { get; set; }
-    [DeleteBehavior(DeleteBehavior.Cascade)] public virtual List<Opening> Openings { get; set; } = new ();
-    [DeleteBehavior(DeleteBehavior.Cascade)] public virtual List<OpenOverride> OpenOverrides { get; set; } = new ();
+    [DeleteBehavior(DeleteBehavior.Cascade)] public virtual List<Schedule> Schedule { get; set; } = new ();
+    [DeleteBehavior(DeleteBehavior.Cascade)] public virtual List<ScheduleOverride> ScheduleOverrides { get; set; } = new ();
     [DeleteBehavior(DeleteBehavior.Cascade)] public virtual List<Notice> Notices { get; set; } = new ();
     public virtual List<string> Managers { get; set; } = new ();
     public virtual List<string> Tags { get; set; } = new ();

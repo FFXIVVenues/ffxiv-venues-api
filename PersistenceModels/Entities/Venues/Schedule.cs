@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
-[Table("Openings", Schema = nameof(Entities.Venues))]
+[Table("Schedules", Schema = nameof(Entities.Venues))]
 [PrimaryKey(nameof(VenueId), nameof(Day), nameof(StartHour), nameof(StartMinute))]
-public class Opening
+public class Schedule
 {
     [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
     public Day Day { get; set; }

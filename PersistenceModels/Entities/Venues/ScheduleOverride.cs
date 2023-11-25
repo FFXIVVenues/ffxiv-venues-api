@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
-[Table("OpenOverrides", Schema = nameof(Venues))]
+[Table("ScheduleOverrides", Schema = nameof(Venues))]
 [PrimaryKey(nameof(VenueId), nameof(Start))]
-public class OpenOverride
+public class ScheduleOverride
 {
     [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
     public bool Open { get; set; }

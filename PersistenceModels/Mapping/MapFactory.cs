@@ -15,13 +15,13 @@ public class MapFactory : IMapFactory
         var blobUriTemplate = config.GetValue<string>("MediaStorage:BlobUriTemplate");
         this._mappingConfiguration = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Opening, VenueModels.Opening>()
+            cfg.CreateMap<Schedule, VenueModels.Opening>()
                 .ForMember(o => o.Start, x => x.MapFrom(s =>
                     new VenueModels.Time { Hour = s.StartHour, Minute = s.StartMinute, TimeZone = s.TimeZone }))
                 .ForMember(o => o.End, x => x.MapFrom(s => s.EndHour == null? null :
                     new VenueModels.Time { Hour = s.EndHour.Value, Minute = s.EndMinute.Value, TimeZone = s.TimeZone, 
                         NextDay = s.EndHour < s.StartHour || (s.EndHour == s.StartHour && s.EndMinute < s.StartMinute )}));
-            cfg.CreateMap<VenueModels.Opening, Opening>()
+            cfg.CreateMap<VenueModels.Schedule, Schedule>()
                 .ForMember(d => d.StartHour, x => x.MapFrom(s => s.Start.Hour))
                 .ForMember(d => d.StartMinute, x => x.MapFrom(s => s.Start.Minute))
                 .ForMember(d => d.EndHour,  x => x.MapFrom(s => s.End == null ? (ushort?)null : s.End.Hour))
@@ -29,7 +29,7 @@ public class MapFactory : IMapFactory
                 .ForMember(d => d.TimeZone, x => x.MapFrom(s => s.Start.TimeZone));
             cfg.CreateMap<DateTime, DateTimeOffset>().ConvertUsing(dt => new DateTimeOffset(dt.ToUniversalTime()));
             cfg.CreateMap<DateTimeOffset, DateTime>().ConvertUsing(offset => offset.UtcDateTime);
-            cfg.CreateMap<OpenOverride, VenueModels.OpenOverride>().ReverseMap();
+            cfg.CreateMap<ScheduleOverride, VenueModels.ScheduleOverride>().ReverseMap();
             cfg.CreateMap<Location, VenueModels.Location>().ReverseMap();
             cfg.CreateMap<Notice, VenueModels.Notice>().ReverseMap();
             cfg.CreateMap<Day, VenueModels.Day>().ReverseMap();
@@ -49,7 +49,7 @@ public class MapFactory : IMapFactory
                     o.Banner != null 
                         ? new Uri(blobUriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner)) 
                         : null));
-            cfg.CreateProjection<Opening, VenueModels.Opening>()
+            cfg.CreateProjection<Schedule, VenueModels.Schedule>()
                 .ForMember(o => o.Day, x => x.MapFrom(o => (int) o.Day))
                 .ForMember(o => o.Start, x => x.MapFrom(s =>
                     new VenueModels.Time { Hour = s.StartHour, Minute = s.StartMinute, TimeZone = s.TimeZone }))
@@ -58,7 +58,7 @@ public class MapFactory : IMapFactory
                         NextDay = s.EndHour < s.StartHour || (s.EndHour == s.StartHour && s.EndMinute < s.StartMinute )}));
             cfg.CreateProjection<Location, VenueModels.Location>();
             cfg.CreateProjection<Notice, VenueModels.Notice>();
-            cfg.CreateProjection<OpenOverride, VenueModels.OpenOverride>();
+            cfg.CreateProjection<ScheduleOverride, VenueModels.ScheduleOverride>();
         });
     }
 

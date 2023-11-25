@@ -88,7 +88,7 @@ namespace FFXIVVenues.Api.Controllers
             if (venue.Id != id)
                 return BadRequest("Venue ID does not match.");
 
-            var existingVenue = this._db.Venues.Include(v => v.Openings).FirstOrDefault(v => v.Id == id);
+            var existingVenue = this._db.Venues.Include(v => v.Schedule).FirstOrDefault(v => v.Id == id);
             
             if (existingVenue == null)
             {
@@ -216,14 +216,14 @@ namespace FFXIVVenues.Api.Controllers
             if (until > DateTime.UtcNow.AddHours(6))
                 return BadRequest("Cannot open for more than 6 hours ahead.");
             
-            var newOverrides = venue.OpenOverrides.Where(o => o.Start > until).ToList();
+            var newOverrides = venue.ScheduleOverrides.Where(o => o.Start > until).ToList();
             newOverrides.Add(new()
             {
                 Open = true,
                 Start = DateTime.UtcNow,
                 End = until
             });
-            venue.OpenOverrides = newOverrides;
+            venue.ScheduleOverrides = newOverrides;
 
             this._db.Venues.Update(venue);
             this._db.SaveChanges();
@@ -245,14 +245,14 @@ namespace FFXIVVenues.Api.Controllers
                 return Unauthorized();
 
 
-            var newOverrides = venue.OpenOverrides.Where(o => o.Start > until).ToList();
+            var newOverrides = venue.ScheduleOverrides.Where(o => o.Start > until).ToList();
             newOverrides.Add(new()
             {
                 Open = false,
                 Start = DateTime.UtcNow,
                 End = until
             });
-            venue.OpenOverrides = newOverrides;
+            venue.ScheduleOverrides = newOverrides;
 
             this._db.Venues.Update(venue);
             this._db.SaveChanges();
