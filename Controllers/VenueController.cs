@@ -128,7 +128,7 @@ namespace FFXIVVenues.Api.Controllers
         public ActionResult<VenueModels.Venue> Delete(string id)
         {
             var venue = this._db.Venues.Find(id);
-            if (venue == null || venue.Deleted != null)
+            if (venue is null || venue.Deleted is not null)
                 return NotFound();
             if (_authorizationManager.Check().CanNot(Operation.Delete, venue))
                 return Unauthorized();

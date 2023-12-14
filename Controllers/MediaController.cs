@@ -42,7 +42,7 @@ namespace FFXIVVenues.Api.Controllers
         public async Task<ActionResult> GetAsync(string id)
         {
             var venue = await this._db.Venues.FindAsync(id);
-            if (venue == null || venue.Deleted != null || _authorizationManager.Check().CanNot(Operation.Read, venue))
+            if (venue is null || venue.Deleted is not null || _authorizationManager.Check().CanNot(Operation.Read, venue))
                 return NotFound();
 
             if (string.IsNullOrEmpty(venue.Banner))
@@ -58,11 +58,11 @@ namespace FFXIVVenues.Api.Controllers
         {
             var venue = await this._db.Venues.FindAsync(id);
 
-            if (venue == null)
+            if (venue is null)
                 return NotFound();
             if (_authorizationManager.Check().CanNot(Operation.Update, venue))
                 return Unauthorized();
-            if (venue.Deleted != null)
+            if (venue.Deleted is not null)
                 return Unauthorized("Cannot PUT to a deleted venue.");
             if (Request.ContentLength > 10_048_576)
                 return BadRequest();
@@ -87,7 +87,7 @@ namespace FFXIVVenues.Api.Controllers
         public async Task<ActionResult> Delete(string id)
         {
             var venue = await this._db.Venues.FindAsync(id);
-            if (venue == null || venue.Deleted != null)
+            if (venue is null || venue.Deleted is not null)
                 return NotFound();
 
             if (_authorizationManager.Check().CanNot(Operation.Delete, venue))
