@@ -128,7 +128,7 @@ namespace FFXIVVenues.Api.PersistenceModels.Migrations
                     b.Property<int?>("EndMinute")
                         .HasColumnType("integer");
 
-                    b.Property<DateTimeOffset?>("From")
+                    b.Property<DateTimeOffset?>("Commencing")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("IntervalArgument")

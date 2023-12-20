@@ -12,7 +12,7 @@ namespace FFXIVVenues.Api.PersistenceModels.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTimeOffset>(
-                name: "From",
+                name: "Commencing",
                 schema: "Venues",
                 table: "Schedules",
                 type: "timestamp with time zone",

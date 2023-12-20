@@ -18,6 +18,7 @@ public class VenueQueryArgs
     public bool? HasBanner { get;set; }
     public bool? Approved { get;set; }
     public bool? Open { get;set; }
+    public bool? WithinWeek { get;set; }
 
     public IQueryable<Domain.Venue> ApplyDomainQueryArgs(IQueryable<Domain.Venue> query)
     {
@@ -44,7 +45,9 @@ public class VenueQueryArgs
     public IEnumerable<Dto.Venue> ApplyDtoQueryArgs(IEnumerable<Dto.Venue> query)
     {
         if (this.Open != null)
-            query = query.AsEnumerable().Where(v => v.IsOpen() == this.Open);
+            query = query.AsEnumerable().Where(v => v.Resolution.IsNow == this.Open);
+        if (this.WithinWeek != null)
+            query = query.AsEnumerable().Where(v => v.Resolution.IsWithinWeek == this.WithinWeek);
         return query;
     }
 

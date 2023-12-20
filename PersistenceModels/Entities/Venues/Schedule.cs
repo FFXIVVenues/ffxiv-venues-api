@@ -12,7 +12,7 @@ public class Schedule
     [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }
     public IntervalType IntervalType { get; set; } = IntervalType.EveryXWeeks;
     public int IntervalArgument { get; set; } = 1;
-    public DateTimeOffset? From { get; set; }
+    public DateTimeOffset? Commencing { get; set; }
     public Day Day { get; set; }
     public ushort StartHour { get; set; }
     public ushort StartMinute { get; set; }
