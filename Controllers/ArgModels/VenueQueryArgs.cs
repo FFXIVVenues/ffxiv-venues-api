@@ -45,9 +45,9 @@ public class VenueQueryArgs
     public IEnumerable<Dto.Venue> ApplyDtoQueryArgs(IEnumerable<Dto.Venue> query)
     {
         if (this.Open != null)
-            query = query.AsEnumerable().Where(v => v.Resolution.IsNow == this.Open);
+            query = query.AsEnumerable().Where(v => (v.Resolution?.IsNow ?? false) == this.Open);
         if (this.WithinWeek != null)
-            query = query.AsEnumerable().Where(v => v.Resolution.IsWithinWeek == this.WithinWeek);
+            query = query.AsEnumerable().Where(v => (v.Resolution?.IsWithinWeek ?? false) == this.WithinWeek);
         return query;
     }
 
