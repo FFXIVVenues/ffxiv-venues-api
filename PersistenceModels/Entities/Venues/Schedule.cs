@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 namespace FFXIVVenues.Api.PersistenceModels.Entities.Venues;
 
 [Table("Schedules", Schema = nameof(Entities.Venues))]
-[PrimaryKey(nameof(VenueId), nameof(Day), nameof(StartHour), nameof(StartMinute))]
+// Commencing may be a factor due to offset of biweekly
+// but can't be added without making it not-nullable
+// ID at some point
+[PrimaryKey(nameof(VenueId), nameof(Day), nameof(StartHour), nameof(StartMinute), nameof(IntervalType), nameof(IntervalArgument))]
 public class Schedule
 {
     [ForeignKey(nameof(Venue))] protected string VenueId { get; set; }

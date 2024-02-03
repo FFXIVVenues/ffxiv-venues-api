@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using FFXIVVenues.Api.PersistenceModels.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace FFXIVVenues.Api.PersistenceModels.Migrations
+namespace FFXIVVenues.Api.Migrations
 {
     [DbContext(typeof(FFXIVVenuesDbContext))]
-    partial class VenuesContextModelSnapshot : ModelSnapshot
+    [Migration("20240203064424_AddIntervalToPrimaryKeys")]
+    partial class AddIntervalToPrimaryKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
