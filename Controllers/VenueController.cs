@@ -79,7 +79,7 @@ namespace FFXIVVenues.Api.Controllers
                 this._db.SaveChanges();
             }
             
-            return this._modelMapper.Map<VenueModels.Venue>(venue);
+            return this._modelMapper.Map<Dto.Venue>(venue);
         }
 
         [HttpPut("{id}")]

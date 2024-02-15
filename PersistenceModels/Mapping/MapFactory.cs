@@ -38,7 +38,10 @@ public class MapFactory : IMapFactory
             cfg.CreateMap<Entities.Venues.Notice, VenueModels.Notice>().ReverseMap();
             cfg.CreateMap<Entities.Venues.Day, VenueModels.Day>().ReverseMap();
             cfg.CreateMap<Entities.Venues.Venue, FFXIVVenues.VenueModels.Venue>()
-                .ForMember(d => d.BannerUri, o => o.MapFrom(o => new Uri(blobUriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner))));
+                .ForMember(d => d.BannerUri, o => o.MapFrom(o => 
+                    o.Banner != null 
+                        ? new Uri(blobUriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner)) 
+                        : null));
             cfg.CreateMap<VenueModels.Venue, Entities.Venues.Venue>()
                 .ForMember(d => d.Added, ex => ex.Ignore())
                 .ForMember(d => d.LastModified, ex => ex.Ignore())
