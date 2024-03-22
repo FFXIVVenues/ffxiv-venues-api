@@ -202,6 +202,25 @@ namespace FFXIVVenues.Api.Controllers
             this._cache.Clear();
             return Ok(venue.Added);
         }
+        
+        [HttpPut("{id}/lastmodified")]
+        public ActionResult LastModified(string id, [FromBody] DateTime lastModified)
+        {
+            var venue = this._db.Venues.Find(id);
+            if (venue == null || venue.Deleted != null)
+                return NotFound();
+
+            if (_authorizationManager.Check().CanNot(Operation.Approve, venue))
+                return Unauthorized();
+
+            venue.LastModified = new DateTimeOffset(lastModified.ToUniversalTime());
+            this._db.Venues.Update(venue);
+            this._db.SaveChanges();
+
+            this._changeBroker.Queue(ObservableOperation.Update, venue);
+            this._cache.Clear();
+            return Ok(venue.Added);
+        }
 
         [HttpPost("{id}/open")]
         public ActionResult Open(string id, [FromBody] DateTime until)
