@@ -24,6 +24,7 @@ public class MapFactory : IMapFactory
                 .ForMember(o => o.Interval, x => x.MapFrom(s => 
                     new Interval { IntervalType = s.IntervalType, IntervalArgument = s.IntervalArgument}));
             cfg.CreateMap<VenueModels.Schedule, Entities.Venues.Schedule>()
+                .ForMember(d => d.Commencing, x => x.MapFrom<DateTimeOffset?>(s => s.Commencing != null ? s.Commencing.Value.ToUniversalTime() : null))
                 .ForMember(d => d.IntervalArgument, x => x.MapFrom(s => s.Interval.IntervalArgument))
                 .ForMember(d => d.IntervalType, x => x.MapFrom(s => s.Interval.IntervalType))
                 .ForMember(d => d.StartHour, x => x.MapFrom(s => s.Start.Hour))

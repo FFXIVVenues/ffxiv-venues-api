@@ -22,7 +22,7 @@ var config = new ConfigurationBuilder()
 
 var host = Host.CreateDefaultBuilder()
     .ConfigureWebHostDefaults(wb => 
-        wb//.UseSentry()
+        wb.UseSentry()
             .UseKestrel()
             .UseIIS()
             .UseIISIntegration()

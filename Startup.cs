@@ -14,63 +14,54 @@ using FFXIVVenues.Api.PersistenceModels.Mapping;
 using FFXIVVenues.Api.PersistenceModels.Media;
 using FFXIVVenues.VenueModels;
 
-namespace FFXIVVenues.Api
+namespace FFXIVVenues.Api;
+
+public class Startup(IConfiguration configuration)
 {
-    public class Startup
+    public void ConfigureServices(IServiceCollection services)
     {
+        var venueCache = new RollingCache<IEnumerable<Venue>>(3*60*1000, 30*60*1000);
 
-        private readonly IConfiguration _configuration;
+        var mediaStorageProvider = configuration.GetValue<string>("MediaStorage:Provider");
+        var authorizationKeys = new List<AuthorizationKey>();
+        configuration.GetSection("Security:AuthorizationKeys").Bind(authorizationKeys);
 
-        public Startup(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        services.AddSingleton<IFFXIVVenuesDbContextFactory, FFXIVVenuesDbContextFactory>();
+        if (mediaStorageProvider.ToLower() == "azure")
+            services.AddSingleton<IMediaRepository, AzureMediaRepository>();
+        else
+            services.AddSingleton<IMediaRepository, LocalMediaRepository>();
+        services.AddSingleton(venueCache);
+        services.AddSingleton<IMapFactory>(new MapFactory(configuration));
+        services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
+        services.AddSingleton<IChangeBroker, ChangeBroker>();
+        services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
+        services.AddControllers();
+        services.AddHttpContextAccessor();
+        services.AddSwaggerGen(c =>
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "FFXIV Venues API", Version = "v1" }));
+    }
 
-        public void ConfigureServices(IServiceCollection services)
-        {
-            var venueCache = new RollingCache<IEnumerable<Venue>>(3*60*1000, 30*60*1000);
-
-            var mediaStorageProvider = _configuration.GetValue<string>("MediaStorage:Provider");
-            var authorizationKeys = new List<AuthorizationKey>();
-            _configuration.GetSection("Security:AuthorizationKeys").Bind(authorizationKeys);
-
-            services.AddSingleton<IFFXIVVenuesDbContextFactory, FFXIVVenuesDbContextFactory>();
-            if (mediaStorageProvider.ToLower() == "azure")
-                services.AddSingleton<IMediaRepository, AzureMediaRepository>();
-            else
-                services.AddSingleton<IMediaRepository, LocalMediaRepository>();
-            services.AddSingleton(venueCache);
-            services.AddSingleton<IMapFactory>(new MapFactory(_configuration));
-            services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
-            services.AddSingleton<IChangeBroker, ChangeBroker>();
-            services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
-            services.AddControllers();
-            services.AddHttpContextAccessor();
-            services.AddSwaggerGen(c =>
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FFXIV Venues API", Version = "v1" }));
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
             
-            if (env.IsDevelopment())
-                app.UseDeveloperExceptionPage();
+        if (env.IsDevelopment())
+            app.UseDeveloperExceptionPage();
 
-            if (_configuration.GetValue("HttpsOnly", true))
-                app.UseHttpsRedirection();
+        if (configuration.GetValue("HttpsOnly", true))
+            app.UseHttpsRedirection();
 
-            if (_configuration.GetValue("EnableSwagger", true))
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FFXIV Venues API v1"));
-            }
-
-            app.UseCors(
-                    pb => pb.SetIsOriginAllowed(s => true).AllowCredentials().AllowAnyHeader())
-                .UseWebSockets()
-                .UseRouting()
-                .UseEndpoints(endpoints => endpoints.MapControllers());
-
+        if (configuration.GetValue("EnableSwagger", true))
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FFXIV Venues API v1"));
         }
+
+        app.UseCors(
+                pb => pb.SetIsOriginAllowed(s => true).AllowCredentials().AllowAnyHeader())
+            .UseWebSockets()
+            .UseRouting()
+            .UseEndpoints(endpoints => endpoints.MapControllers());
+
     }
 }

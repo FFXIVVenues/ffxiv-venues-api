@@ -13,42 +13,28 @@ using FFXIVVenues.VenueModels.Observability;
 namespace FFXIVVenues.Api.Controllers
 {
     [ApiController]
-    public class MediaController : ControllerBase, IDisposable
+    public class MediaController(
+        IMediaRepository mediaManager,
+        IAuthorizationManager authorizationManager,
+        IChangeBroker changeBroker,
+        IFFXIVVenuesDbContextFactory dbContextFactory,
+        RollingCache<IEnumerable<VenueModels.Venue>> cache)
+        : ControllerBase, IDisposable
     {
 
-        private readonly ILogger<MediaController> _logger;
-        private readonly IMediaRepository _mediaManager;
-        private readonly IAuthorizationManager _authorizationManager;
-        private readonly IChangeBroker _changeBroker;
-        private readonly FFXIVVenuesDbContext _db;
-        private readonly RollingCache<IEnumerable<VenueModels.Venue>> _cache;
-
-        public MediaController(ILogger<MediaController> logger,
-                               IMediaRepository mediaManager,
-                               IAuthorizationManager authorizationManager,
-                               IChangeBroker changeBroker,
-                               IFFXIVVenuesDbContextFactory dbContextFactory,
-                               RollingCache<IEnumerable<VenueModels.Venue>> cache)
-        {
-            this._logger = logger;
-            this._mediaManager = mediaManager;
-            this._authorizationManager = authorizationManager;
-            this._changeBroker = changeBroker;
-            this._db = dbContextFactory.Create();
-            this._cache = cache;
-        }
+        private readonly FFXIVVenuesDbContext _db = dbContextFactory.Create();
 
         [HttpGet("/venue/{id}/media")]
         public async Task<ActionResult> GetAsync(string id)
         {
             var venue = await this._db.Venues.FindAsync(id);
-            if (venue is null || venue.Deleted is not null || _authorizationManager.Check().CanNot(Operation.Read, venue))
+            if (venue is null || venue.Deleted is not null || authorizationManager.Check().CanNot(Operation.Read, venue))
                 return NotFound();
 
             if (string.IsNullOrEmpty(venue.Banner))
                 return new FileStreamResult(System.IO.File.OpenRead("default-banner.jpg"), "image/jpeg");
 
-            var (stream, contentType) = await _mediaManager.Download(venue.Banner, HttpContext.RequestAborted);
+            var (stream, contentType) = await mediaManager.Download(venue.Banner, HttpContext.RequestAborted);
 
             return File(stream, contentType);
         }
@@ -60,7 +46,7 @@ namespace FFXIVVenues.Api.Controllers
 
             if (venue is null)
                 return NotFound();
-            if (_authorizationManager.Check().CanNot(Operation.Update, venue))
+            if (authorizationManager.Check().CanNot(Operation.Update, venue))
                 return Unauthorized();
             if (venue.Deleted is not null)
                 return Unauthorized("Cannot PUT to a deleted venue.");
@@ -70,15 +56,15 @@ namespace FFXIVVenues.Api.Controllers
                 return BadRequest();
 
             if (!string.IsNullOrEmpty(venue.Banner))
-                await _mediaManager.Delete(venue.Banner);
+                await mediaManager.Delete(venue.Banner);
 
-            venue.Banner = await _mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
+            venue.Banner = await mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
             venue.LastModified = DateTimeOffset.UtcNow;
             this._db.Venues.Update(venue);
             await this._db.SaveChangesAsync();
             
-            this._cache.Clear();
-            this._changeBroker.Queue(ObservableOperation.Update, venue);
+            cache.Clear();
+            changeBroker.Queue(ObservableOperation.Update, venue);
             
             return NoContent();
         }
@@ -90,20 +76,20 @@ namespace FFXIVVenues.Api.Controllers
             if (venue is null || venue.Deleted is not null)
                 return NotFound();
 
-            if (_authorizationManager.Check().CanNot(Operation.Delete, venue))
+            if (authorizationManager.Check().CanNot(Operation.Delete, venue))
                 return Unauthorized();
 
             if (string.IsNullOrEmpty(venue.Banner))
                 return NoContent();
 
-            await _mediaManager.Delete(venue.Banner);
+            await mediaManager.Delete(venue.Banner);
 
             venue.Banner = null;
             this._db.Venues.Update(venue);
             await this._db.SaveChangesAsync();
             
-            this._cache.Clear();
-            this._changeBroker.Queue(ObservableOperation.Update, venue);
+            cache.Clear();
+            changeBroker.Queue(ObservableOperation.Update, venue);
 
             return NoContent();
         }
