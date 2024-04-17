@@ -3,7 +3,7 @@ name: Build and publish Production API
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build_and_publish:
