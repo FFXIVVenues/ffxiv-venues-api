@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Sentry;
 
 var environment = args.SkipWhile(s => !string.Equals(s, "--environment", StringComparison.OrdinalIgnoreCase)).Skip(1).FirstOrDefault()
                   ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
@@ -22,8 +21,7 @@ var config = new ConfigurationBuilder()
 
 var host = Host.CreateDefaultBuilder()
     .ConfigureWebHostDefaults(wb => 
-        wb.UseSentry()
-            .UseKestrel()
+        wb.UseKestrel()
             .UseIIS()
             .UseIISIntegration()
             .UseConfiguration(config)
