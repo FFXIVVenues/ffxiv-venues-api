@@ -1,4 +1,4 @@
-name: Build and publish UAT API
+name: Build and publish Test API
 
 on:
   push:

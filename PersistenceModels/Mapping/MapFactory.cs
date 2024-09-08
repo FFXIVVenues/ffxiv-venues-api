@@ -34,7 +34,9 @@ public class MapFactory : IMapFactory
                 .ForMember(d => d.TimeZone, x => x.MapFrom(s => s.Start.TimeZone));
             cfg.CreateMap<DateTime, DateTimeOffset>().ConvertUsing(dt => new DateTimeOffset(dt.ToUniversalTime()));
             cfg.CreateMap<DateTimeOffset, DateTime>().ConvertUsing(offset => offset.UtcDateTime);
-            cfg.CreateMap<Entities.Venues.ScheduleOverride, VenueModels.ScheduleOverride>().ReverseMap();
+            cfg.CreateMap<DateTimeOffset, DateTimeOffset>().ConvertUsing(offset => offset.ToUniversalTime());
+            cfg.CreateMap<Entities.Venues.ScheduleOverride, VenueModels.ScheduleOverride>()
+                .ReverseMap();
             cfg.CreateMap<Entities.Venues.Location, VenueModels.Location>().ReverseMap();
             cfg.CreateMap<Entities.Venues.Notice, VenueModels.Notice>().ReverseMap();
             cfg.CreateMap<Entities.Venues.Day, VenueModels.Day>().ReverseMap();
