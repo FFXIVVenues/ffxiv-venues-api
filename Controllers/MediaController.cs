@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Helpers;
@@ -12,6 +11,9 @@ using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Controllers;
 
+/// <summary>
+/// Venue image endpoints
+/// </summary>
 [ApiController]
 public class MediaController(
     IMediaRepository mediaManager,
@@ -21,9 +23,13 @@ public class MediaController(
     RollingCache<IEnumerable<VenueModels.Venue>> cache)
     : ControllerBase, IDisposable
 {
-
     private readonly FFXIVVenuesDbContext _db = dbContextFactory.Create();
 
+    /// <summary>
+    /// Get a venue's image
+    /// </summary>
+    /// <param name="id">The Id of the venue.</param>
+    /// <returns>The image for the venue, otherwise a default banner image.</returns>
     [HttpGet("/venue/{id}/media")]
     public async Task<ActionResult> GetAsync(string id)
     {
@@ -39,6 +45,15 @@ public class MediaController(
         return File(stream, contentType);
     }
 
+    /// <summary>
+    /// Upload / update the image for a venue
+    /// </summary>
+    /// <remarks>
+    /// This endpoint requires an Authorization Key with Update permission.
+    /// The target venue must be created by the Authorization Key provided
+    /// or the provided Authorization Key must have a scope of 'all'.
+    /// </remarks>
+    /// <param name="id">The Id of the venue.</param>
     [HttpPut("/venue/{id}/media")]
     public async Task<ActionResult> PutAsync(string id)
     {
@@ -62,13 +77,22 @@ public class MediaController(
         venue.LastModified = DateTimeOffset.UtcNow;
         this._db.Venues.Update(venue);
         await this._db.SaveChangesAsync();
-            
+
         cache.Clear();
         changeBroker.Queue(ObservableOperation.Update, venue);
-            
+
         return NoContent();
     }
 
+    /// <summary>
+    /// Delete the media (banner) associated with a specific venue.
+    /// </summary>
+    /// <remarks>
+    /// This endpoint requires an Authorization Key with Delete permission.
+    /// The target venue must be created by the Authorization Key provided
+    /// or the provided Authorization Key must have a scope of 'all'.
+    /// </remarks>
+    /// <param name="id">The Id of the venue.</param>
     [HttpDelete("/venue/{id}/media")]
     public async Task<ActionResult> Delete(string id)
     {
@@ -87,7 +111,7 @@ public class MediaController(
         venue.Banner = null;
         this._db.Venues.Update(venue);
         await this._db.SaveChangesAsync();
-            
+
         cache.Clear();
         changeBroker.Queue(ObservableOperation.Update, venue);
 
