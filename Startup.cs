@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using AutoMapper;
+using System.Reflection;
 using FFXIVVenues.Api.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +13,7 @@ using FFXIVVenues.Api.PersistenceModels.Context;
 using FFXIVVenues.Api.PersistenceModels.Mapping;
 using FFXIVVenues.Api.PersistenceModels.Media;
 using FFXIVVenues.VenueModels;
+using Scalar.AspNetCore;
 
 namespace FFXIVVenues.Api;
 
@@ -38,8 +39,14 @@ public class Startup(IConfiguration configuration)
         services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
         services.AddControllers();
         services.AddHttpContextAccessor();
+        
+        // todo: Remove the below services for .net 9
         services.AddSwaggerGen(c =>
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "FFXIV Venues API", Version = "v1" }));
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "FFXIV Venues API", Version = "v1" });
+            c.IncludeXmlComments(Assembly.GetExecutingAssembly());
+        });
+        services.AddEndpointsApiExplorer();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -51,17 +58,20 @@ public class Startup(IConfiguration configuration)
         if (configuration.GetValue("HttpsOnly", true))
             app.UseHttpsRedirection();
 
-        if (configuration.GetValue("EnableSwagger", true))
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FFXIV Venues API v1"));
-        }
-
         app.UseCors(
-                pb => pb.SetIsOriginAllowed(s => true).AllowCredentials().AllowAnyHeader())
+                pb => pb.SetIsOriginAllowed(_ => true).AllowCredentials().AllowAnyHeader())
+            .UseSwagger(options => 
+                options.RouteTemplate = "openapi/{documentName}.json")
             .UseWebSockets()
             .UseRouting()
-            .UseEndpoints(endpoints => endpoints.MapControllers());
+            .UseEndpoints(endpoints =>
+            {
+                endpoints.MapScalarApiReference();
+                endpoints.MapControllers();
+            });
 
+        // todo: Add for .net 9, replace UseSwagger and MapScalarApiReference
+        // app.MapOpenApi();
+        // app.MapScalarApiReference();
     }
 }
