@@ -1,3 +1,4 @@
 ﻿<Solution>
-  <Project Path="FFXIVVenues.Api.csproj" />
+  <Project Path="FFXIVVenues.Api\FFXIVVenues.Api.csproj" />
+  <Project Path="FFXIVVenues.Playwright\FFXIVVenues.Playwright.csproj" Type="Classic C#" />
 </Solution>

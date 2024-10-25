@@ -19,5 +19,5 @@ jobs:
           password: ${{ secrets.DOCKER_ACCESS_TOKEN}}
 
       - name: Build and push docker image
-        run: docker build --push --platform linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/ffxivvenues.api:latest ./
+        run: docker build --push --platform linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/ffxivvenues.api:latest ./FFXIVVenues.Api
         
