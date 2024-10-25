@@ -1,0 +1,143 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>FFXIVVenues.Api</RootNamespace>
+    <Nullable>disable</Nullable>
+    <UserSecretsId>ffxiv-venues-api-secrets</UserSecretsId>
+    <LangVersion>latest</LangVersion>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>bin\Debug\FFXIVVenues.Api.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\FFXIVVenues.Api.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="AutoMapper.EF6" Version="3.0.1" />
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.21.2" />
+    <PackageReference Include="EntityFramework" Version="6.5.1" />
+    <PackageReference Include="FFXIVVenues.VenueModels" Version="14.2.0" />
+    <PackageReference Include="LiteDb" Version="5.0.21" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="1.2.9" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="default-banner.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Remove="media\zy2skSzMfmJ8" />
+    <None Remove="media\zxjSk2Y9ttZh" />
+    <None Remove="media\zvL7ZTSgVJdN" />
+    <None Remove="media\zv5Rx0Qpb3P0" />
+    <None Remove="media\zskz2MtRLmkr" />
+    <None Remove="media\zrX12wqNW1GZ" />
+    <None Remove="media\zqZ2PrqDG5zn" />
+    <None Remove="media\zqWCvln5k4PS" />
+    <None Remove="media\zqF2vfZt3Gkr" />
+    <None Remove="media\zpmLbghlcvWh" />
+    <None Remove="media\znqh3jxHBr7G" />
+    <None Remove="media\znJ0ClFjcymS" />
+    <None Remove="media\zn1YwVKd4jQh" />
+    <None Remove="media\zkj3GN2LxXRy" />
+    <None Remove="media\zkdWr72j51s2" />
+    <None Remove="media\zjb7ctyCCMpm" />
+    <None Remove="media\zjX8sNlspl57" />
+    <None Remove="media\zhmFLTqrFnfd" />
+    <None Remove="media\zh7j6Ml4f9PT" />
+    <None Remove="media\zh5NwmqdpKTV" />
+    <None Remove="media\zfyYPyKlCK8y" />
+    <None Remove="media\zfmkClK444ty" />
+    <None Remove="media\zfcgDF29Y2nh" />
+    <None Remove="media\zdwXnn4ZLMqy" />
+    <None Remove="media\zdmhY4RVtBQK" />
+    <None Remove="media\zdKdqN6Dwnws" />
+    <None Remove="media\zbdmRPXPWZFB" />
+    <None Remove="media\zbX6250X1MBg" />
+    <None Remove="media\zbW5hfHrb08S" />
+    <None Remove="media\zbJPMn5GK0JR" />
+    <None Remove="media\zZRydJdvwSV3" />
+    <None Remove="media\zYnL7prr8N5K" />
+    <None Remove="media\zYk5mcyXj4kV" />
+    <None Remove="media\zXZZw7bcVc8M" />
+    <None Remove="media\zXDvyXp9mnd2" />
+    <None Remove="media\zVybqwc8dGc4" />
+    <None Remove="media\zVn8QksC38tj" />
+    <None Remove="media\zVWn5tNnQ5PS" />
+    <None Remove="media\zT2VHMnGYDRw" />
+    <None Remove="media\zSgdQRpllGVy" />
+    <None Remove="media\zRnBMHwSjKxJ" />
+    <None Remove="media\zRkBSzNfLlW5" />
+    <None Remove="media\zR2SFfW74nCw" />
+    <None Remove="media\zQ3k1p9pm9tc" />
+    <None Remove="media\zN7q199qkpkl" />
+    <None Remove="media\zN4PqSbKjP7D" />
+    <None Remove="media\zN0Hy322g73p" />
+    <None Remove="media\zMNkHs3XjtDd" />
+    <None Remove="media\zL4LdPmjgFjf" />
+    <None Remove="media\zKwxmP3k3Xcq" />
+    <None Remove="media\zFgPSQrHgqFS" />
+    <None Remove="media\zFGdvKs0ft1W" />
+    <None Remove="media\zF3PlGZVtjk2" />
+    <None Remove="media\zDb616367dBt" />
+    <None Remove="media\zCsGNwGnnt8d" />
+    <None Remove="media\zCgkkVpYTf3n" />
+    <None Remove="media\zBxP2WGKsjvH" />
+    <None Remove="media\zBsjs41lV8KR" />
+    <None Remove="media\zB66d0MJCl1Z" />
+    <None Remove="media\zB5PxgpZrwgn" />
+    <None Remove="media\z9D9NYqHkq36" />
+    <None Remove="media\z974s7mWtTTw" />
+    <None Remove="media\z7h98T5Y1F20" />
+    <None Remove="media\z7YRsHDzNdgv" />
+    <None Remove="media\z7XpqJthJJQG" />
+    <None Remove="media\z7L4dzVWtcdh" />
+    <None Remove="media\z7KlML4dY3Tv" />
+    <None Remove="media\z7G1wbSb6CCG" />
+    <None Remove="media\z6k8Bq537mD7" />
+    <None Remove="media\z5pmzxShn33n" />
+    <None Remove="media\z5bGDZBrq2nx" />
+    <None Remove="media\z5V9wlq6SCwG" />
+    <None Remove="media\z4rVWjR7QD18" />
+    <None Remove="media\z4mCrY7JCC6c" />
+    <None Remove="media\z4kc5xRDWq5W" />
+    <None Remove="media\z4c10960NF7T" />
+    <None Remove="media\z4BTcS9DMQWJ" />
+    <None Remove="media\z3XD5yNg0NLM" />
+    <None Remove="media\z3K9lYw6GwRX" />
+    <None Remove="media\z3JKFX1rS0bN" />
+    <None Remove="media\z3GqP8Hz2TNY" />
+    <None Remove="media\z38wFc1rKQcF" />
+    <None Remove="media\z28tFNNn28R4" />
+    <None Remove="media\z241m8RfShhy" />
+    <None Remove="media\z1hc5BTxycXH" />
+    <None Remove="media\z125HbVj1bnQ" />
+    <None Remove="media\z0t8Bb2qxj4T" />
+    <None Remove="media\z0lkDKv1rbGZ" />
+    <None Remove="media\z0XrYqCpzp0c" />
+    <None Remove="media\yzKQtXlDXl3W" />
+    <None Remove="media\yy9CZR44yJwQ" />
+    <None Remove="media\yxbbnYxPc203" />
+    <None Remove="media\yvp6gBZzp2tP" />
+    <None Remove="media\yvPJR18VwQD6" />
+    <None Remove="media\yvCPTDPCglk5" />
+    <None Remove="media\yspBfs2PGr5p" />
+  </ItemGroup>
+
+</Project>
