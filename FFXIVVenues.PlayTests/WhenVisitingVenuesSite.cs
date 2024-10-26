@@ -10,7 +10,10 @@ public class WhenVisitingVenuesSite : PageTest
     [SetUp]
     public async Task SetUp()
     {
-        await Page.GotoAsync("https://ffxivvenues.com");
+        var host = Environment.GetEnvironmentVariable("HOST") ?? "https://ffxivvenues.com";
+        if (!host.StartsWith("http"))
+            host = "https://" + host;
+        await Page.GotoAsync(host);
     }
 
     [Test]
