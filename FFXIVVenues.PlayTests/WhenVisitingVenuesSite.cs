@@ -25,7 +25,9 @@ public class WhenVisitingVenuesSite : PageTest
     [Test]
     public async Task VenueCardsAreShown()
     {
-        await Expect(Page.GetByText("Today")).ToBeVisibleAsync();
+        var today = Page.GetByText($"Today ({DateTime.Today.DayOfWeek.ToString()})");
+        await today.ScrollIntoViewIfNeededAsync();
+        await Expect(today).ToBeVisibleAsync();
     }
 
     [Test]
