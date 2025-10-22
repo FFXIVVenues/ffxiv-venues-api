@@ -6,7 +6,8 @@ namespace FFXIVVenues.Api.PersistenceModels.Media;
     
 public interface IMediaRepository
 {
-    Task Delete(string key);
-    Task<(Stream Stream, string ContentType)> Download(string key, CancellationToken cancellationToken);
-    Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken);
+    bool IsMetered { get; }
+    Task Delete(string venueId, string key);
+    Task<(Stream Stream, string ContentType)> Download(string venueId, string key, CancellationToken cancellationToken);
+    Task<string> Upload(string venueId, string contentType, long contentLength, Stream stream, CancellationToken cancellationToken);
 }

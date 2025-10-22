@@ -12,7 +12,7 @@ public class MapFactory : IMapFactory
 
     public MapFactory(IConfiguration config)
     {
-        var blobUriTemplate = config.GetValue<string>("MediaStorage:BlobUriTemplate");
+        var uriTemplate = config.GetValue<string>("MediaStorage:UriTemplate");
         this._mappingConfiguration = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Entities.Venues.Schedule, VenueModels.Schedule>()
@@ -43,7 +43,7 @@ public class MapFactory : IMapFactory
             cfg.CreateMap<Entities.Venues.Venue, FFXIVVenues.VenueModels.Venue>()
                 .ForMember(d => d.BannerUri, o => o.MapFrom(o => 
                     o.Banner != null 
-                        ? new Uri(blobUriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner)) 
+                        ? new Uri(uriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner)) 
                         : null));
             cfg.CreateMap<VenueModels.Venue, Entities.Venues.Venue>()
                 .ForMember(d => d.Added, ex => ex.Ignore())
@@ -57,7 +57,7 @@ public class MapFactory : IMapFactory
            cfg.CreateProjection<Entities.Venues.Venue, VenueModels.Venue>()
                 .ForMember(dto => dto.BannerUri, conf => conf.MapFrom(o => 
                     o.Banner != null 
-                        ? new Uri(blobUriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner)) 
+                        ? new Uri(uriTemplate.Replace("{venueId}", o.Id).Replace("{bannerKey}", o.Banner)) 
                         : null));
             cfg.CreateProjection<Entities.Venues.Schedule, VenueModels.Schedule>()
                 .ForMember(o => o.Day, x => x.MapFrom(o => (int) o.Day))

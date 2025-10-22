@@ -8,6 +8,7 @@ using FFXIVVenues.Api.Observability;
 using FFXIVVenues.Api.PersistenceModels.Context;
 using FFXIVVenues.Api.PersistenceModels.Media;
 using FFXIVVenues.VenueModels.Observability;
+using Microsoft.AspNetCore.Http;
 
 namespace FFXIVVenues.Api.Controllers;
 
@@ -26,13 +27,17 @@ public class MediaController(
     private readonly FFXIVVenuesDbContext _db = dbContextFactory.Create();
 
     /// <summary>
-    /// Get a venue's image
+    /// Get a venue's image.
     /// </summary>
     /// <param name="id">The Id of the venue.</param>
+    /// <code></code>
     /// <returns>The image for the venue, otherwise a default banner image.</returns>
     [HttpGet("/venue/{id}/media")]
     public async Task<ActionResult> GetAsync(string id)
     {
+        if (mediaManager.IsMetered)
+            return this.StatusCode(StatusCodes.Status403Forbidden);
+        
         var venue = await this._db.Venues.FindAsync(id);
         if (venue is null || venue.Deleted is not null || authorizationManager.Check().CanNot(Operation.Read, venue))
             return NotFound();
@@ -40,7 +45,7 @@ public class MediaController(
         if (string.IsNullOrEmpty(venue.Banner))
             return new FileStreamResult(System.IO.File.OpenRead("default-banner.jpg"), "image/jpeg");
 
-        var (stream, contentType) = await mediaManager.Download(venue.Banner, HttpContext.RequestAborted);
+        var (stream, contentType) = await mediaManager.Download(venue.Id, venue.Banner, HttpContext.RequestAborted);
 
         return File(stream, contentType);
     }
@@ -71,9 +76,12 @@ public class MediaController(
             return BadRequest();
 
         if (!string.IsNullOrEmpty(venue.Banner))
-            await mediaManager.Delete(venue.Banner);
+            await mediaManager.Delete(venue.Id, venue.Banner);
 
-        venue.Banner = await mediaManager.Upload(Request.ContentType, Request.Body, HttpContext.RequestAborted);
+        if (! Request.ContentLength.HasValue)
+            return this.BadRequest();
+        
+        venue.Banner = await mediaManager.Upload(id, Request.ContentType, Request.ContentLength.Value, Request.Body, HttpContext.RequestAborted);
         venue.LastModified = DateTimeOffset.UtcNow;
         this._db.Venues.Update(venue);
         await this._db.SaveChangesAsync();
@@ -106,7 +114,7 @@ public class MediaController(
         if (string.IsNullOrEmpty(venue.Banner))
             return NoContent();
 
-        await mediaManager.Delete(venue.Banner);
+        await mediaManager.Delete(venue.Id, venue.Banner);
 
         venue.Banner = null;
         this._db.Venues.Update(venue);

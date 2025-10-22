@@ -28,7 +28,9 @@ public class Startup(IConfiguration configuration)
         configuration.GetSection("Security:AuthorizationKeys").Bind(authorizationKeys);
 
         services.AddSingleton<IFFXIVVenuesDbContextFactory, FFXIVVenuesDbContextFactory>();
-        if (mediaStorageProvider.ToLower() == "azure")
+        if (mediaStorageProvider.ToLower() == "s3")
+            services.AddSingleton<IMediaRepository, S3MediaRepository>();
+        else if (mediaStorageProvider.ToLower() == "azure")
             services.AddSingleton<IMediaRepository, AzureMediaRepository>();
         else
             services.AddSingleton<IMediaRepository, LocalMediaRepository>();

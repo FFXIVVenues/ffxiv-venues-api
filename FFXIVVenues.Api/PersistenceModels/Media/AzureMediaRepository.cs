@@ -16,10 +16,12 @@ public class AzureMediaRepository : IMediaRepository
 {
     private readonly IConfiguration _config;
 
+    public bool IsMetered => true;
+    
     public AzureMediaRepository(IConfiguration config) =>
         _config = config;
 
-    public async Task<(Stream Stream, string ContentType)> Download(string key, CancellationToken cancellationToken)
+    public async Task<(Stream Stream, string ContentType)> Download(string venueId, string key, CancellationToken cancellationToken)
     {
         var container = GetBlobContainerClient();
         var blob = container.GetBlobClient(key);
@@ -28,7 +30,7 @@ public class AzureMediaRepository : IMediaRepository
         return (response.Value.Content, response.Value.Details.ContentType);
     }
 
-    public async Task<string> Upload(string contentType, Stream stream, CancellationToken cancellationToken)
+    public async Task<string> Upload(string venueId, string contentType, long contentLength, Stream stream, CancellationToken cancellationToken)
     {
         var key = IdHelper.GenerateId();
         var container = GetBlobContainerClient();
@@ -40,7 +42,7 @@ public class AzureMediaRepository : IMediaRepository
         return key;
     }
 
-    public async Task Delete(string key)
+    public async Task Delete(string venueId, string key)
     {
         var container = GetBlobContainerClient();
         var blob = container.GetBlobClient(key);
@@ -49,17 +51,17 @@ public class AzureMediaRepository : IMediaRepository
 
     private BlobContainerClient GetBlobContainerClient()
     {
-        var connectionString = _config.GetValue<string>("MediaStorage:ConnectionString");
+        var connectionString = _config.GetValue<string>("MediaStorage:Azure:ConnectionString");
         if (connectionString != null)
         {
-            var containerName = _config.GetValue<string>("MediaStorage:ContainerName");
+            var containerName = _config.GetValue<string>("MediaStorage:Azure:ContainerName");
             if (containerName == null)
                 throw new Exception("No connection string configured for media storage.");
 
             return new BlobContainerClient(connectionString, containerName);
         }
             
-        var containerUri = _config.GetValue<string>("MediaStorage:ContainerUri");
+        var containerUri = _config.GetValue<string>("MediaStorage:Azure:ContainerUri");
         if (containerUri != null)
             return new BlobContainerClient(new Uri(containerUri), new DefaultAzureCredential());
 
