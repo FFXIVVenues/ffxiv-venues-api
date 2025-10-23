@@ -1,0 +1,4 @@
+﻿<Solution>
+  <Project Path="FFXIVVenues.Api\FFXIVVenues.Api.csproj" />
+  <Project Path="FFXIVVenues.PlayTests\FFXIVVenues.PlayTests.csproj" Type="Classic C#" />
+</Solution>
