@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
+using FFXIVVenues.DomainData.Entities.Venues;
 using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Observability;

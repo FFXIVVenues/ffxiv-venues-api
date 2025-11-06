@@ -1,0 +1,27 @@
+<#@ template language="C#" #>
+<#@ import namespace="VenueModels" #>
+<#@ import namespace="System.Text.Encodings.Web" #>
+
+<# var venue = (Venue) Session["venue"]; #>
+<# var description = string.Join("\n\n", venue.Description); #>
+<# var encoder = HtmlEncoder.Default; #>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title><#= encoder.Encode(venue.Name) #> - FFXIV Venues</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<#= encoder.Encode(venue.Name) #> - FFXIV Venues">
+    <meta property="twitter:title" content="<#= encoder.Encode(venue.Name) #> - FFXIV Venues">
+
+    <meta name="description" content="<#= encoder.Encode(description) #>">
+    <meta property="og:description" content="<#= encoder.Encode(description) #>">
+    <meta property="twitter:description" content="<#= encoder.Encode(description) #>">
+
+    <meta property="og:image" content="<#= encoder.Encode(venue.BannerUri.ToString()) #>">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:image" content="<#= encoder.Encode(venue.BannerUri.ToString()) #>">
+  </head>
+</html>

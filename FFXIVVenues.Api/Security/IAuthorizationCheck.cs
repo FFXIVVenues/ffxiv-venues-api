@@ -1,13 +1,13 @@
 ﻿using System.Linq;
+using FFXIVVenues.DomainData.Entities.Venues;
 
-namespace FFXIVVenues.Api.Security
+namespace FFXIVVenues.Api.Security;
+
+public interface IAuthorizationCheck
 {
-    public interface IAuthorizationCheck
-    {
-        bool CanNot(Operation op, ISecurityScoped entity = null);
+    bool CanNot(Operation op, Venue venue = null);
 
-        bool Can(Operation op, ISecurityScoped entity = null);
-        
-        IQueryable<T> Can<T>(Operation op, IQueryable<T> queryable) where T : ISecurityScoped;
-    }
+    bool Can(Operation op, Venue venue = null);
+
+    IQueryable<Venue> Can(Operation op, IQueryable<Venue> queryable);
 }

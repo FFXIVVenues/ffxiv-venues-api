@@ -1,84 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FFXIVVenues.DomainData.Entities.Venues;
 
-namespace FFXIVVenues.Api.Security
+namespace FFXIVVenues.Api.Security;
+
+public class AuthorizationCheck(AuthorizationKey key) : IAuthorizationCheck
 {
-    public class AuthorizationCheck : IAuthorizationCheck
+    public bool CanNot(Operation op, Venue venue = null) => !Can(op, venue);
+
+    public bool Can(Operation op, Venue venue = null)
     {
-        private readonly AuthorizationKey _key;
-
-        public AuthorizationCheck(AuthorizationKey _key) =>
-            this._key = _key;
-
-        public bool CanNot(Operation op, ISecurityScoped entity = null) => !Can(op, entity);
-
-        public bool Can(Operation op, ISecurityScoped entity = null)
-        {
-            if (op == Operation.Create && entity != null)
-                throw new InvalidOperationException("Cannot authorise Create permission against an existing item.");
+        if (op == Operation.Create && venue != null)
+            throw new InvalidOperationException("Cannot authorise Create permission against an existing item.");
             
-            if (op == Operation.Create)
-                return _key.Create;
+        if (op == Operation.Create)
+            return key.Create;
             
-            if (entity == null)
-                return false;
+        if (venue == null)
+            return false;
             
-            if (op == Operation.Read && entity.Approved)
-                return true;
+        if (op == Operation.Read && venue.Approved)
+            return true;
             
-            if (_key.Scope == "all" || (_key.Scope == "approved" && entity.Approved))
-                return op switch
-                {
-                    Operation.Read => true,
-                    Operation.Approve => _key.Approve,
-                    Operation.Create => _key.Create,
-                    Operation.Update => _key.Update,
-                    Operation.Delete => _key.Delete,
-                    _ => false
-                };
-
-            return entity.ScopeKey == _key.Key && op switch
+        if (key.Scope == "all" || (key.Scope == "approved" && venue.Approved))
+            return op switch
             {
                 Operation.Read => true,
-                Operation.Approve => _key.Approve,
-                Operation.Create => _key.Create,
-                Operation.Update => _key.Update,
-                Operation.Delete => _key.Delete,
-                _ => false
-            };
-        }
-
-        public IQueryable<T> Can<T>(Operation op, IQueryable<T> queryable) where T : ISecurityScoped
-        {
-            if (op == Operation.Create)
-                throw new InvalidOperationException("Cannot items venues on Create permission.");
-            
-            var opAuthorised = op switch
-            {
-                Operation.Read => true,
-                Operation.Approve => _key.Approve,
-                Operation.Create => _key.Create,
-                Operation.Update => _key.Update,
-                Operation.Delete => _key.Delete,
+                Operation.Approve => key.Approve,
+                Operation.Create => key.Create,
+                Operation.Update => key.Update,
+                Operation.Delete => key.Delete,
                 _ => false
             };
 
-            if (!opAuthorised)
-                return new List<T>().AsQueryable();
-
-            if (_key.Scope == "all")
-                return queryable;
-            
-            if (op == Operation.Read || _key.Scope == "approved")
-                return queryable.Where(i => i.Approved || i.ScopeKey == _key.Key);
-            
-            return queryable.Where(i => i.ScopeKey == _key.Key);
-        }
-        
-        
+        return venue.ScopeKey == key.Key && op switch
+        {
+            Operation.Read => true,
+            Operation.Approve => key.Approve,
+            Operation.Create => key.Create,
+            Operation.Update => key.Update,
+            Operation.Delete => key.Delete,
+            _ => false
+        };
     }
-    
-    
 
+    public IQueryable<Venue> Can(Operation op, IQueryable<Venue> queryable)
+    {
+        if (op == Operation.Create)
+            throw new InvalidOperationException("Cannot items venues on Create permission.");
+            
+        var opAuthorised = op switch
+        {
+            Operation.Read => true,
+            Operation.Approve => key.Approve,
+            Operation.Create => key.Create,
+            Operation.Update => key.Update,
+            Operation.Delete => key.Delete,
+            _ => false
+        };
+
+        if (!opAuthorised)
+            return new List<Venue>().AsQueryable();
+
+        if (key.Scope == "all")
+            return queryable;
+            
+        if (op == Operation.Read || key.Scope == "approved")
+            return queryable.Where(i => i.Approved || i.ScopeKey == key.Key);
+            
+        return queryable.Where(i => i.ScopeKey == key.Key);
+    }
+        
+        
 }

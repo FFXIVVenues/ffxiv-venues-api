@@ -1,9 +1,8 @@
-﻿using FFXIVVenues.Api.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
+using FFXIVVenues.DomainData.Entities.Venues;
+using FFXIVVenues.DomainData.Helpers;
 using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Observability

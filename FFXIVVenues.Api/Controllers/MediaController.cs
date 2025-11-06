@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Helpers;
+using FFXIVVenues.Api.Media;
 using FFXIVVenues.Api.Observability;
-using FFXIVVenues.Api.PersistenceModels.Context;
-using FFXIVVenues.Api.PersistenceModels.Media;
+using FFXIVVenues.DomainData.Context;
 using FFXIVVenues.VenueModels.Observability;
 using Microsoft.AspNetCore.Http;
 
@@ -20,11 +20,10 @@ public class MediaController(
     IMediaRepository mediaManager,
     IAuthorizationManager authorizationManager,
     IChangeBroker changeBroker,
-    IFFXIVVenuesDbContextFactory dbContextFactory,
+    DomainDataContext domainData,
     RollingCache<IEnumerable<VenueModels.Venue>> cache)
     : ControllerBase, IDisposable
 {
-    private readonly FFXIVVenuesDbContext _db = dbContextFactory.Create();
 
     /// <summary>
     /// Get a venue's image.
@@ -38,7 +37,7 @@ public class MediaController(
         if (mediaManager.IsMetered)
             return this.StatusCode(StatusCodes.Status403Forbidden);
         
-        var venue = await this._db.Venues.FindAsync(id);
+        var venue = await domainData.Venues.FindAsync(id);
         if (venue is null || venue.Deleted is not null || authorizationManager.Check().CanNot(Operation.Read, venue))
             return NotFound();
 
@@ -62,7 +61,7 @@ public class MediaController(
     [HttpPut("/venue/{id}/media")]
     public async Task<ActionResult> PutAsync(string id)
     {
-        var venue = await this._db.Venues.FindAsync(id);
+        var venue = await domainData.Venues.FindAsync(id);
 
         if (venue is null)
             return NotFound();
@@ -83,8 +82,8 @@ public class MediaController(
         
         venue.Banner = await mediaManager.Upload(id, Request.ContentType, Request.ContentLength.Value, Request.Body, HttpContext.RequestAborted);
         venue.LastModified = DateTimeOffset.UtcNow;
-        this._db.Venues.Update(venue);
-        await this._db.SaveChangesAsync();
+        domainData.Venues.Update(venue);
+        await domainData.SaveChangesAsync();
 
         cache.Clear();
         changeBroker.Queue(ObservableOperation.Update, venue);
@@ -104,7 +103,7 @@ public class MediaController(
     [HttpDelete("/venue/{id}/media")]
     public async Task<ActionResult> Delete(string id)
     {
-        var venue = await this._db.Venues.FindAsync(id);
+        var venue = await domainData.Venues.FindAsync(id);
         if (venue is null || venue.Deleted is not null)
             return NotFound();
 
@@ -117,8 +116,8 @@ public class MediaController(
         await mediaManager.Delete(venue.Id, venue.Banner);
 
         venue.Banner = null;
-        this._db.Venues.Update(venue);
-        await this._db.SaveChangesAsync();
+        domainData.Venues.Update(venue);
+        await domainData.SaveChangesAsync();
 
         cache.Clear();
         changeBroker.Queue(ObservableOperation.Update, venue);
@@ -128,6 +127,6 @@ public class MediaController(
 
     public void Dispose()
     {
-        _db?.Dispose();
+        domainData?.Dispose();
     }
 }

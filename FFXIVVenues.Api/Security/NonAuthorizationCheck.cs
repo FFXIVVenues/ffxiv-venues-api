@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
+using FFXIVVenues.DomainData.Entities.Venues;
 
-namespace FFXIVVenues.Api.Security
+namespace FFXIVVenues.Api.Security;
+
+public class NonAuthorizationCheck : IAuthorizationCheck
 {
-    public class NonAuthorizationCheck : IAuthorizationCheck
-    {
 
-        public bool CanNot(Operation op, ISecurityScoped _ = null) => !Can(op, _);
+    public bool CanNot(Operation op, Venue _ = null) => !Can(op, _);
 
-        public bool Can(Operation op, ISecurityScoped entity = null) => 
-            op == Operation.Read && entity?.Approved == true;
+    public bool Can(Operation op, Venue venue = null) => 
+        op == Operation.Read && venue?.Approved == true;
         
-        public IQueryable<T> Can<T>(Operation op, IQueryable<T> queryable) where T : ISecurityScoped =>
-            op == Operation.Read ? queryable.Where(i => i.Approved) : new List<T>().AsQueryable();
+    public IQueryable<Venue> Can(Operation op, IQueryable<Venue> queryable) =>
+        op == Operation.Read ? queryable.Where(i => i.Approved) : new List<Venue>().AsQueryable();
 
-    }
 }

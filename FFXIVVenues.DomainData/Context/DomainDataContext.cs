@@ -1,0 +1,28 @@
+﻿using FFXIVVenues.DomainData.Entities;
+using FFXIVVenues.DomainData.Entities.Metrics;
+using FFXIVVenues.DomainData.Entities.Venues;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Configuration;
+using DbContext = Microsoft.EntityFrameworkCore.DbContext;
+
+namespace FFXIVVenues.DomainData.Context;
+
+public class DomainDataContext(DbContextOptions<DomainDataContext> options) : DbContext(options)
+{
+    public DbSet<Venue> Venues { get; set; }
+    public DbSet<VenueView> VenueViews { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.HasDefaultSchema("Venues");
+        base.OnModelCreating(modelBuilder);
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder
+            .UseNpgsql(o => o.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "Venues"));
+        optionsBuilder.UseLazyLoadingProxies();
+    }
+}

@@ -1,8 +1,7 @@
-namespace FFXIVVenues.Api.Security
+namespace FFXIVVenues.Api.Security;
+
+public interface ISecurityScoped
 {
-    public interface ISecurityScoped
-    {
-        bool Approved { get; }
-        string ScopeKey { get; }
-    }
+    bool Approved { get; }
+    string ScopeKey { get; }
 }

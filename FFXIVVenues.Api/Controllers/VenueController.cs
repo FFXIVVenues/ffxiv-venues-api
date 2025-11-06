@@ -14,15 +14,15 @@ using Microsoft.EntityFrameworkCore;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Observability;
 using FFXIVVenues.Api.Helpers;
-using FFXIVVenues.Api.PersistenceModels.Context;
-using FFXIVVenues.Api.PersistenceModels.Entities;
-using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
-using FFXIVVenues.Api.PersistenceModels.Mapping;
-using FFXIVVenues.Api.PersistenceModels.Media;
+using FFXIVVenues.DomainData.Context;
+using FFXIVVenues.DomainData.Entities;
+using FFXIVVenues.DomainData.Entities.Metrics;
+using FFXIVVenues.DomainData.Mapping;
 using FFXIVVenues.VenueModels.Observability;
 using Microsoft.AspNetCore.Http;
 using VenueObservation = FFXIVVenues.Api.Observability.VenueObservation;
 using Dto = FFXIVVenues.VenueModels;
+using Domain = FFXIVVenues.DomainData.Entities.Venues;
 
 namespace FFXIVVenues.Api.Controllers;
 
@@ -35,13 +35,12 @@ public class VenueController(
     IAuthorizationManager authorizationManager,
     IMapFactory mapFactory,
     IChangeBroker changeBroker,
-    IFFXIVVenuesDbContextFactory dbContextFactory,
+    DomainDataContext domainData,
     RollingCache<IEnumerable<Dto.Venue>> cache)
     : ControllerBase, IDisposable
 {
     private readonly IMapper _modelMapper = mapFactory.GetModelMapper();
     private readonly IMapper _modelProjector = mapFactory.GetModelProjector();
-    private readonly FFXIVVenuesDbContext _db = dbContextFactory.Create();
 
     /// <summary>
     /// Get all/many venues
@@ -55,7 +54,7 @@ public class VenueController(
     [HttpGet]
     public IEnumerable<VenueModels.Venue> Get([FromQuery] VenueQueryArgs queryArgs)
     {
-        var query = this._db.Venues.AsQueryable();
+        var query = domainData.Venues.AsQueryable();
         query = queryArgs.ApplyDomainQueryArgs(query);
         query = query.Where(v => v.Deleted == null);
         query = authorizationManager.Check().Can(Operation.Read, query);
@@ -72,14 +71,14 @@ public class VenueController(
     [HttpGet("{id}")]
     public ActionResult<VenueModels.Venue> GetById(string id, bool? recordView = true)
     {
-        var venue = this._db.Venues.Find(id);
+        var venue = domainData.Venues.Find(id);
         if (venue == null || venue.Deleted != null || authorizationManager.Check().CanNot(Operation.Read, venue))
             return NotFound();
 
         if (recordView == null || recordView == true)
         {
-            this._db.VenueViews.Add(new VenueView(venue));
-            this._db.SaveChanges();
+            domainData.VenueViews.Add(new VenueView(venue));
+            domainData.SaveChanges();
         }
 
         return this._modelMapper.Map<Dto.Venue>(venue);
@@ -106,7 +105,7 @@ public class VenueController(
         if (venue.Id != id)
             return BadRequest("Venue ID does not match.");
 
-        var existingVenue = this._db.Venues.Include(v => v.Schedule).FirstOrDefault(v => v.Id == id);
+        var existingVenue = domainData.Venues.Include(v => v.Schedule).FirstOrDefault(v => v.Id == id);
 
         if (existingVenue == null)
         {
@@ -114,10 +113,10 @@ public class VenueController(
                 return Unauthorized();
 
             var owningKey = authorizationManager.GetKeyString();
-            var newInternalVenue = this._modelMapper.Map<PersistenceModels.Entities.Venues.Venue>(venue);
+            var newInternalVenue = this._modelMapper.Map<Domain.Venue>(venue);
             newInternalVenue.ScopeKey = owningKey;
-            this._db.Venues.Add(newInternalVenue);
-            await this._db.SaveChangesAsync();
+            domainData.Venues.Add(newInternalVenue);
+            await domainData.SaveChangesAsync();
 
             changeBroker.Queue(ObservableOperation.Create, newInternalVenue);
             cache.Clear();
@@ -133,8 +132,8 @@ public class VenueController(
 
         this._modelMapper.Map(venue, existingVenue);
         existingVenue.LastModified = DateTimeOffset.UtcNow;
-        this._db.Venues.Update(existingVenue);
-        await this._db.SaveChangesAsync();
+        domainData.Venues.Update(existingVenue);
+        await domainData.SaveChangesAsync();
 
         changeBroker.Queue(ObservableOperation.Update, existingVenue);
         cache.Clear();
@@ -155,15 +154,15 @@ public class VenueController(
     [HttpDelete("{id}")]
     public ActionResult<VenueModels.Venue> Delete(string id)
     {
-        var venue = this._db.Venues.Find(id);
+        var venue = domainData.Venues.Find(id);
         if (venue is null || venue.Deleted is not null)
             return NotFound();
         if (authorizationManager.Check().CanNot(Operation.Delete, venue))
             return Unauthorized();
 
         venue.Deleted = DateTimeOffset.UtcNow;
-        this._db.Venues.Update(venue);
-        this._db.SaveChanges();
+        domainData.Venues.Update(venue);
+        domainData.SaveChanges();
 
         changeBroker.Queue(ObservableOperation.Delete, venue);
         cache.Clear();
@@ -179,7 +178,7 @@ public class VenueController(
     [HttpGet("{id}/approved")]
     public ActionResult Approved(string id)
     {
-        var venue = this._db.Venues.Find(id);
+        var venue = domainData.Venues.Find(id);
         if (venue == null || venue.Deleted != null)
             return NotFound();
 
@@ -204,7 +203,7 @@ public class VenueController(
     [HttpPut("{id}/approved")]
     public async Task<ActionResult> Approved(string id, [FromBody] bool approved)
     {
-        var venue = await this._db.Venues.FindAsync(id);
+        var venue = await domainData.Venues.FindAsync(id);
         if (venue == null || venue.Deleted != null)
             return NotFound();
 
@@ -214,8 +213,8 @@ public class VenueController(
         if (venue.Approved != approved)
         {
             venue.Approved = approved;
-            this._db.Venues.Update(venue);
-            await this._db.SaveChangesAsync();
+            domainData.Venues.Update(venue);
+            await domainData.SaveChangesAsync();
 
             cache.Clear();
             changeBroker.Queue(ObservableOperation.Update, venue);
@@ -224,7 +223,7 @@ public class VenueController(
         return Ok(venue.Approved);
     }
 
-    private static PropertyInfo _addedField = typeof(PersistenceModels.Entities.Venues.Venue).GetProperty("Added");
+    private static PropertyInfo _addedField = typeof(Domain.Venue).GetProperty("Added");
 
     /// <summary>
     /// Update added date of a venue
@@ -240,7 +239,7 @@ public class VenueController(
     [HttpPut("{id}/added")]
     public ActionResult Added(string id, [FromBody] DateTime added)
     {
-        var venue = this._db.Venues.Find(id);
+        var venue = domainData.Venues.Find(id);
         if (venue == null || venue.Deleted != null)
             return NotFound();
 
@@ -248,8 +247,8 @@ public class VenueController(
             return Unauthorized();
 
         venue.Added = new DateTimeOffset(added.ToUniversalTime());
-        this._db.Venues.Update(venue);
-        this._db.SaveChanges();
+        domainData.Venues.Update(venue);
+        domainData.SaveChanges();
 
         changeBroker.Queue(ObservableOperation.Update, venue);
         cache.Clear();
@@ -270,7 +269,7 @@ public class VenueController(
     [HttpPut("{id}/lastmodified")]
     public ActionResult LastModified(string id, [FromBody] DateTime lastModified)
     {
-        var venue = this._db.Venues.Find(id);
+        var venue = domainData.Venues.Find(id);
         if (venue == null || venue.Deleted != null)
             return NotFound();
 
@@ -278,8 +277,8 @@ public class VenueController(
             return Unauthorized();
 
         venue.LastModified = new DateTimeOffset(lastModified.ToUniversalTime());
-        this._db.Venues.Update(venue);
-        this._db.SaveChanges();
+        domainData.Venues.Update(venue);
+        domainData.SaveChanges();
 
         changeBroker.Queue(ObservableOperation.Update, venue);
         cache.Clear();
@@ -300,7 +299,7 @@ public class VenueController(
     [HttpPut("{id}/scheduleoverride")]
     public ActionResult PutScheduleOveride(string id, [FromBody] Dto.ScheduleOverride @override)
     {
-        var venue = this._db.Venues.Find(id);
+        var venue = domainData.Venues.Find(id);
         if (venue == null || venue.Deleted != null)
             return NotFound();
 
@@ -311,12 +310,12 @@ public class VenueController(
             return BadRequest("Cannot open for more than 7 hours.");
 
         var newOverrides = venue.ScheduleOverrides.Where(o => o.Start > @override.End).ToList();
-        var domainScheduleOverride = this._modelMapper.Map<ScheduleOverride>(@override);
+        var domainScheduleOverride = this._modelMapper.Map<Domain.ScheduleOverride>(@override);
         newOverrides.Add(domainScheduleOverride);
         venue.ScheduleOverrides = newOverrides;
 
-        this._db.Venues.Update(venue);
-        this._db.SaveChanges();
+        domainData.Venues.Update(venue);
+        domainData.SaveChanges();
 
         changeBroker.Queue(ObservableOperation.Update, venue);
         cache.Clear();
@@ -340,22 +339,22 @@ public class VenueController(
     public ActionResult DeleteScheduleOveride(string id, [FromQuery] DateTimeOffset? from,
         [FromQuery] DateTimeOffset? to)
     {
-        var venue = this._db.Venues.Find(id);
+        var venue = domainData.Venues.Find(id);
         if (venue == null || venue.Deleted != null)
             return NotFound();
 
         if (authorizationManager.Check().CanNot(Operation.Update, venue))
             return Unauthorized();
 
-        var newOverrides = new List<ScheduleOverride>();
+        var newOverrides = new List<Domain.ScheduleOverride>();
         if (from is not null)
             newOverrides.AddRange(venue.ScheduleOverrides.Where(o => o.End < from));
         if (to is not null)
             newOverrides.AddRange(venue.ScheduleOverrides.Where(o => o.Start > to));
         venue.ScheduleOverrides = newOverrides;
 
-        this._db.Venues.Update(venue);
-        this._db.SaveChanges();
+        domainData.Venues.Update(venue);
+        domainData.SaveChanges();
 
         changeBroker.Queue(ObservableOperation.Update, venue);
         cache.Clear();
@@ -499,6 +498,6 @@ public class VenueController(
 
     public void Dispose()
     {
-        _db?.Dispose();
+        domainData?.Dispose();
     }
 }

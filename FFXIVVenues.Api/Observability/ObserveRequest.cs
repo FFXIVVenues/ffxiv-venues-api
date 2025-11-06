@@ -1,25 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
+using FFXIVVenues.DomainData.Entities.Venues;
 using FFXIVVenues.VenueModels.Observability;
 
 namespace FFXIVVenues.Api.Observability;
 
-public class ObserveRequest
+public class ObserveRequest(
+    IEnumerable<ObservableOperation> operationCriteria,
+    ObservableKey? keyCriteria,
+    string valueCriteria)
 {
-        
-    public ObserveRequest(IEnumerable<ObservableOperation> operationCriteria, 
-        ObservableKey? keyCriteria, string valueCriteria)
-    {
-        this.OperationCriteria = operationCriteria;
-        this.KeyCriteria = keyCriteria;
-        this.ValueCriteria = valueCriteria;
-    }
+    public IEnumerable<ObservableOperation> OperationCriteria { get; set; } = operationCriteria;
+    public ObservableKey? KeyCriteria { get; set; } = keyCriteria;
+    public string ValueCriteria { get; set; } = valueCriteria;
 
-    public IEnumerable<ObservableOperation> OperationCriteria { get; set; }
-    public ObservableKey? KeyCriteria { get; set; }
-    public string ValueCriteria { get; set; }
-        
     public bool Matches(ObservableOperation operation, Venue venue)
     {
         if (venue == null) return false;

@@ -1,3 +1,5 @@
 ﻿<Solution>
   <Project Path="FFXIVVenues.Api\FFXIVVenues.Api.csproj" />
+  <Project Path="FFXIVVenues.DomainData\FFXIVVenues.DomainData.csproj" Type="Classic C#" />
+  <Project Path="FFXIVVenues.OGCard\FFXIVVenues.OGCard.csproj" Type="Classic C#" />
 </Solution>

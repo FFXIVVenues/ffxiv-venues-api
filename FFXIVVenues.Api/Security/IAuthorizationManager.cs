@@ -1,13 +1,9 @@
-﻿using System.Linq;
-using FFXIVVenues.Api.PersistenceModels.Entities.Venues;
+﻿namespace FFXIVVenues.Api.Security;
 
-namespace FFXIVVenues.Api.Security
+public interface IAuthorizationManager
 {
-    public interface IAuthorizationManager
-    {
-        string GetKeyString();
-        AuthorizationKey GetKey(string key = null);
-        bool IsAuthenticated();
-        IAuthorizationCheck Check(string key = null);
-    }
+    string GetKeyString();
+    AuthorizationKey GetKey(string key = null);
+    bool IsAuthenticated();
+    IAuthorizationCheck Check(string key = null);
 }

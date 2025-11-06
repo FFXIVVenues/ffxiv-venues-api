@@ -9,9 +9,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using FFXIVVenues.Api.Security;
 using FFXIVVenues.Api.Observability;
-using FFXIVVenues.Api.PersistenceModels.Context;
-using FFXIVVenues.Api.PersistenceModels.Mapping;
-using FFXIVVenues.Api.PersistenceModels.Media;
+using FFXIVVenues.Api.Media;
+using FFXIVVenues.DomainData;
+using FFXIVVenues.DomainData.Context;
+using FFXIVVenues.DomainData.Mapping;
 using FFXIVVenues.VenueModels;
 using Scalar.AspNetCore;
 
@@ -23,11 +24,12 @@ public class Startup(IConfiguration configuration)
     {
         var venueCache = new RollingCache<IEnumerable<Venue>>(3*60*1000, 30*60*1000);
 
+        var connectionString = configuration.GetConnectionString("FFXIVVenues");
+        var mediaUriTemplate = configuration.GetValue<string>("MediaStorage:UriTemplate");
         var mediaStorageProvider = configuration.GetValue<string>("MediaStorage:Provider");
         var authorizationKeys = new List<AuthorizationKey>();
         configuration.GetSection("Security:AuthorizationKeys").Bind(authorizationKeys);
 
-        services.AddSingleton<IFFXIVVenuesDbContextFactory, FFXIVVenuesDbContextFactory>();
         if (mediaStorageProvider.ToLower() == "s3")
             services.AddSingleton<IMediaRepository, S3MediaRepository>();
         else if (mediaStorageProvider.ToLower() == "azure")
@@ -35,7 +37,10 @@ public class Startup(IConfiguration configuration)
         else
             services.AddSingleton<IMediaRepository, LocalMediaRepository>();
         services.AddSingleton(venueCache);
-        services.AddSingleton<IMapFactory>(new MapFactory(configuration));
+        
+        // todo: move these to UseDomainData() or something
+        services.AddDomainData(connectionString, mediaUriTemplate);
+        
         services.AddSingleton<IAuthorizationManager, AuthorizationManager>();
         services.AddSingleton<IChangeBroker, ChangeBroker>();
         services.AddSingleton<IEnumerable<AuthorizationKey>>(authorizationKeys);
