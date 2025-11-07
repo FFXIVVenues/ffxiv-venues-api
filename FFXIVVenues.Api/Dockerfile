@@ -8,7 +8,7 @@ RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
 RUN chmod +x dotnet-install.sh
 RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
-FROM ubuntu:latest AS build
+FROM base AS build
 COPY ./FFXIVVenues.Api /src/FFXIVVenues.Api
 COPY ./FFXIVVenues.DomainData /src/FFXIVVenues.DomainData
 RUN ./dotnet-install.sh --channel STS --install-dir /usr/share/dotnet
