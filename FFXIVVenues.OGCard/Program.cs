@@ -4,7 +4,7 @@ using FFXIVVenues.DomainData.Mapping;
 using FFXIVVenues.OGCard;
 
 var config = new ConfigurationBuilder()
-    .AddEnvironmentVariables("FFXIV_VENUES_API:")
+    .AddEnvironmentVariables("FFXIV_VENUES_OGCARD:")
     .AddUserSecrets<Program>()
     .AddCommandLine(args)
     .Build();
