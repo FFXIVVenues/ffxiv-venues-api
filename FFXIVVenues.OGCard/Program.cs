@@ -14,7 +14,6 @@ var mediaUriTemplate = config.GetValue<string>("UriTemplate",
     "https://images.ffxivvenues.dev/{venueId}/{bannerKey}");
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddConfiguration(config);
 builder.Services.AddDomainData(connectionString, mediaUriTemplate);
 var app = builder.Build();
 app.MapGet("/venue/{venueId}", (string venueId, IMapFactory mapFactory, DomainDataContext domainData) =>
