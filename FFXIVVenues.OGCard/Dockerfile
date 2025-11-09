@@ -19,7 +19,6 @@ FROM base AS final
 RUN ./dotnet-install.sh --channel STS --runtime aspnetcore --install-dir /usr/share/dotnet
 
 ENV ASPNETCORE_URLS=http://0.0.0.0:80
-ENV FFXIV_VENUES_API__HttpsOnly=False
 EXPOSE 80
 
 WORKDIR /app
