@@ -9,13 +9,6 @@ var config = new ConfigurationBuilder()
     .AddCommandLine(args)
     .Build();
 
-Console.WriteLine("All keys in config:");
-foreach (var kv in config.AsEnumerable())
-    Console.WriteLine($"{kv.Key} = {kv.Value}");
-
-Console.WriteLine("Connection string lookup:");
-Console.WriteLine(config.GetConnectionString("FFXIVVenues") ?? "<null>");
-
 var connectionString = config.GetConnectionString("FFXIVVenues");
 var mediaUriTemplate = config.GetValue<string>("UriTemplate", 
     "https://images.ffxivvenues.dev/{venueId}/{bannerKey}");
