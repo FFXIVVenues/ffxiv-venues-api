@@ -2,6 +2,8 @@ using FFXIVVenues.DomainData;
 using FFXIVVenues.DomainData.Context;
 using FFXIVVenues.DomainData.Mapping;
 using FFXIVVenues.OGCard;
+using Serilog;
+using Serilog.Events;
 
 var config = new ConfigurationBuilder()
     .AddEnvironmentVariables("FFXIV_VENUES_OGCARD__")
@@ -12,10 +14,19 @@ var config = new ConfigurationBuilder()
 var connectionString = config.GetConnectionString("FFXIVVenues");
 var mediaUriTemplate = config.GetValue<string>("UriTemplate", 
     "https://images.ffxivvenues.dev/{venueId}/{bannerKey}");
+var betterStackToken = config.GetValue<string>("Logging:BetterStackToken");
+var minLevel = config.GetValue<LogEventLevel>("Logging:MinimumLevel");
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.BetterStack(betterStackToken)
+    .MinimumLevel.Is(minLevel)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDomainData(connectionString, mediaUriTemplate);
+builder.Logging.AddSerilog();
 var app = builder.Build();
+
 app.MapGet("/venue/{venueId}", (string venueId, IMapFactory mapFactory, DomainDataContext domainData) =>
 {
     var query = domainData.Venues.AsQueryable().Where(v => v.Id == venueId);
@@ -28,4 +39,5 @@ app.MapGet("/venue/{venueId}", (string venueId, IMapFactory mapFactory, DomainDa
     template.Session["venue"] = venue;
     return Results.Content(template.TransformText(), "text/html");
 });
+
 await app.RunAsync();

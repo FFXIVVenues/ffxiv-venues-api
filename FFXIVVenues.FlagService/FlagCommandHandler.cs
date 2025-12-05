@@ -1,0 +1,46 @@
+using System.Security.Cryptography;
+using System.Text;
+using FFXIVVenues.DomainData.Context;
+using FFXIVVenues.DomainData.Entities.Flags;
+using FFXIVVenues.FlagService.Client.Commands;
+
+namespace FFXIVVenues.FlagService;
+
+public class FlagCommandHandler(DomainDataContext domainData, ILogger<FlagCommandHandler> logger)
+{
+    public void Handle(FlagVenueCommand command)
+    {
+        var sourceAddress = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(command.SourceAddress)));
+        logger.LogInformation("Handling flag for venue {VenueId} from {SourceAddress}", command.VenueId, sourceAddress);
+        
+        var venueExists = domainData.Venues.Any(v => v.Id == command.VenueId && v.Deleted == null);
+        if (!venueExists)
+        {
+            logger.LogInformation("Rejecting flag from {SourceAddress} for venue {VenueId}, venue does not exist", command.VenueId, sourceAddress);   
+            return;
+        }
+        
+        var recentFlagsForVenueFromAddress = domainData.Flags.Any(f => 
+            f.VenueId == command.VenueId &&
+            f.SourceAddress == sourceAddress && 
+            f.Category == command.Category &&
+            f.Timestamp > DateTimeOffset.UtcNow.AddHours(-20));
+        if (recentFlagsForVenueFromAddress)
+        {
+            logger.LogInformation("Rejecting flag, {SourceAddress} flagged venue {VenueId} recently", command.VenueId, sourceAddress);
+            return;
+        }
+
+        var flag = new Flag
+        {
+            VenueId = command.VenueId,
+            SourceAddress = sourceAddress,
+            Category = command.Category,
+            Description = command.Description
+        };
+        logger.LogDebug("Flag for venue {VenueId} from {SourceAddress} accepted, saving", command.VenueId, sourceAddress);
+        domainData.Flags.Add(flag);
+        domainData.SaveChanges();
+        logger.LogInformation("Flag for venue {VenueId} from {SourceAddress} saved", command.VenueId, sourceAddress);
+    }
+}
