@@ -11,6 +11,7 @@ RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 FROM base AS build
 COPY ./FFXIVVenues.Api /src/FFXIVVenues.Api
 COPY ./FFXIVVenues.DomainData /src/FFXIVVenues.DomainData
+COPY ./FFXIVVenues.FlagService.Client /src/FFXIVVenues.FlagService.Client
 RUN ./dotnet-install.sh --channel STS --install-dir /usr/share/dotnet
 RUN dotnet publish /src/FFXIVVenues.Api/FFXIVVenues.Api.csproj -c Release -o /src/build
 
