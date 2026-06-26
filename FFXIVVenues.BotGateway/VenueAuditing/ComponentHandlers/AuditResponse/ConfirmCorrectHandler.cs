@@ -36,7 +36,7 @@ public class ConfirmCorrectHandler(
 
         if (!authorizer.Authorize(context.Interaction.User.Id, Permission.EditVenue, venue).Authorized)
         {
-            await context.Interaction.Message.Channel.SendMessageAsync("Sorry, I can't let you do that. 🥲");
+            await context.Interaction.Message.Channel.SendMessageAsync("Sorry, I can't let you do that. 🥲", flags: MessageFlags.Ephemeral);
             return;
         }
         

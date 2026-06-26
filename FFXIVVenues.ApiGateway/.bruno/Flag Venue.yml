@@ -1,0 +1,22 @@
+info:
+  name: Flag Venue
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: "{{scheme}}://{{base-url}}/v1.0/venue/{{?Venue Id}}/flag"
+  body:
+    type: json
+    data: |-
+      {
+        "category": "VenueEmpty",
+        "description": "Meow!"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

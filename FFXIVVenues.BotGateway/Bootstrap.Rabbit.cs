@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Wolverine;
 using Wolverine.RabbitMQ;
+using FFXIVVenues.FlagService.Client;
 
 namespace FFXIVVenues.Veni;
 
@@ -16,6 +17,7 @@ internal static partial class Bootstrap
                     e.BindQueue("FFXIVVenues.Veni.EventsInbox.Flagging"))
                 .AutoProvision();
             opts.ListenToRabbitQueue("FFXIVVenues.Veni.EventsInbox.Flagging");
+            opts.AddFlagServiceMessages();
         });
     }
 }

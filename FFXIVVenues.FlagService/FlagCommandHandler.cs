@@ -55,6 +55,7 @@ public class FlagCommandHandler(IMessageBus bus, DomainDataContext domainData, I
         logger.LogInformation("Flag for venue {VenueId} from {SourceAddress} saved", command.VenueId, sourceAddress);
         
         return bus.PublishAsync(new VenueFlaggedEvent(
+            flag.Id,
             command.VenueId,
             command.Category,
             command.Description,
