@@ -29,6 +29,7 @@ using FFXIVVenues.BotGateway.Infrastructure.Intent;
 using FFXIVVenues.BotGateway.Infrastructure.Presence;
 using FFXIVVenues.BotGateway.UserSupport;
 using FFXIVVenues.BotGateway.VenueDiscovery.Commands;
+using FFXIVVenues.BotGateway.VenueEvents.VenueFlags;
 
 var builder = Host.CreateApplicationBuilder(args);
 

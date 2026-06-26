@@ -1,3 +1,3 @@
 namespace FFXIVVenues.FlagService.Client.Events;
 
-public record FlagResolvedEvent(string FlagId, string VenueId, long ResolvedBy);
+public record FlagResolvedEvent(string FlagId, string VenueId, ulong ResolvedBy);

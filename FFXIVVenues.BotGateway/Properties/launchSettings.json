@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "VenuesBot": {
+    "FFXIVVenues.BotGateway": {
       "commandName": "Project"
     },
     "WSL": {

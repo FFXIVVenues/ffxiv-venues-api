@@ -18,7 +18,7 @@ public class Flag
     public string SourceAddress { get; set;  }
     public FlagResolution Resolution { get; set; }
     public DateTimeOffset ResolutionDate { get; set; }
-    public long ResolvedBy { get; set; }
+    public ulong ResolvedBy { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

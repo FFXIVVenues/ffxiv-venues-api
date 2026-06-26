@@ -17,6 +17,8 @@ public static class BuilderExtensions
     {
         wolverineOptions
             .PublishMessage<FlagVenueCommand>().ToRabbitQueue("FFXIVVenues.Flagging.Commands");
+        wolverineOptions.PublishMessage<ResolveFlagCommand>().ToRabbitQueue("FFXIVVenues.Flagging.Commands");
+        wolverineOptions.PublishMessage<DismissFlagCommand>().ToRabbitQueue("FFXIVVenues.Flagging.Commands");
         return wolverineOptions;
     }
 }
