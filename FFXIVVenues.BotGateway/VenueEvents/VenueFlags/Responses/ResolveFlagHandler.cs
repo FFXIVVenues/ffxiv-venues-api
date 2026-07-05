@@ -20,7 +20,7 @@ public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepositor
         var userId = context.Interaction.User.Id;
 
         var flag = await repository.GetByIdAsync<VenueFlagDistribution>(flagId);
-        var venue = await apiService.GetVenueAsync(flag.VenueId);
+        var venue = await apiService.GetVenueAsync(flag.Flag.VenueId);
 
         if (!authorizer.Authorize(context.Interaction.User.Id, Permission.RespondToFlags, venue).Authorized)
         {
@@ -29,6 +29,6 @@ public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepositor
         }
 
         await flagServiceClient.ResolveFlagAsync(flagId, userId);
-        await context.Interaction.RespondAsync("Flag resolved, thankies!", ephemeral: true);
+        await context.Interaction.FollowupAsync("Flag resolved, thankies!", flags: MessageFlags.Ephemeral);
     }
 }

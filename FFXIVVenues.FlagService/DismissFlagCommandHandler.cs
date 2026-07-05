@@ -27,8 +27,8 @@ public class DismissFlagCommandHandler(IMessageBus bus, DomainDataContext domain
         
         return bus.PublishAsync(new FlagDismissedEvent(
             command.FlagId,
-            flag.VenueId,
-            command.DismissedBy
+            command.DismissedBy,
+            flag
         ));
     }
 }

@@ -1,19 +1,20 @@
-﻿using Discord;
+﻿ using Discord;
 using Discord.WebSocket;
 using FFXIVVenues.BotGateway.Api;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
-using FFXIVVenues.BotGateway.VenueRendering;
 using FFXIVVenues.FlagService.Client.Events;
 using Serilog;
 using System.Threading.Tasks;
 
-namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags;
+namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags.Events;
 
-public class FlagResolvedHandler(IRepository repository, IDiscordClient client)
+public class FlagResolvedHandler(IRepository repository, IApiService apiService, IDiscordClient client, IVenueFlagRenderer flagRenderer)
 {
     public async Task Handle(FlagResolvedEvent @event)
     {
+        var venue = await apiService.GetVenueAsync(@event.Flag.VenueId);
         var flagDistribution = await repository.GetByIdAsync<VenueFlagDistribution>(@event.FlagId);
+        var flagEmbed = flagRenderer.RenderFlag(venue, @event.Flag);
         foreach (var flagDistributionMessage in flagDistribution.Messages)
         {
             var channel = await client.GetChannelAsync(flagDistributionMessage.ChannelId);
@@ -22,13 +23,14 @@ public class FlagResolvedHandler(IRepository repository, IDiscordClient client)
                 Log.Debug("Could not update flag distribution message, channel {ChannelId} does not exist or is not a text channel, skipping", flagDistributionMessage.ChannelId);
                 continue;
             }
+            
             await socketTextChannel.ModifyMessageAsync(flagDistributionMessage.MessageId, props =>
             {
                 props.Components = new ComponentBuilder().Build();
                 props.Embeds = new[]
                 {
-                    props.Embeds.Value?[0],
-                    new EmbedBuilder().WithDescription("✅ Flag resolved").Build()
+                    flagEmbed.Build(),
+                    new EmbedBuilder().WithDescription($"Flag resolved by {MentionUtils.MentionUser(@event.ResolvedBy)}").Build()
                 };
             });
         }

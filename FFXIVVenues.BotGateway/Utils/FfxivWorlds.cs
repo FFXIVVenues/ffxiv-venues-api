@@ -10,7 +10,15 @@ public static class FfxivWorlds
     public const string REGION_NA = "North America"; 
     public const string REGION_OCE = "Oceania"; 
     public const string REGION_EU = "Europe"; 
-    public const string REGION_JPN = "Japan"; 
+    public const string REGION_JPN = "Japan";
+
+    public static readonly Dictionary<string, string> RegionFlags = new()
+    {
+        { REGION_NA, ":flag_us:" },
+        { REGION_OCE, ":flag_au:" },
+        { REGION_EU, ":flag_eu:" },
+        { REGION_JPN, ":flag_jp:" },
+    };
 
     private static readonly Dictionary<string, bool> Regions = new()
     {
@@ -61,5 +69,8 @@ public static class FfxivWorlds
     
     public static string GetRegionForDataCenter(string dataCenter) =>
         dataCenter == null ? null : DataCenterMap.FirstOrDefault(kv => kv.Value.Contains(dataCenter, StringComparer.InvariantCultureIgnoreCase)).Key;
+
+    public static string GetFlagForRegion(string region) =>
+        RegionFlags.GetValueOrDefault(region);
     
 }
