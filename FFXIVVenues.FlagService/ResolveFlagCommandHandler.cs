@@ -10,6 +10,8 @@ public class ResolveFlagCommandHandler(IMessageBus bus, DomainDataContext domain
 {
     public ValueTask Handle(ResolveFlagCommand command)
     {
+        logger.LogInformation("Handling resolution of flag {FlagId} from {UserId}", command.FlagId, command.ResolvedBy);
+
         var flag = domainData.Flags.FirstOrDefault(f => f.Id == command.FlagId);
         if (flag == null)
         {

@@ -29,7 +29,7 @@ public class FlagDismissedHandler(IRepository repository, IDiscordClient client,
                 props.Embeds = new[]
                 {
                     flagEmbed.Build(),
-                    new EmbedBuilder().WithDescription($"Flag dimissed by {MentionUtils.MentionUser(@event.ResolvedBy)}").Build()
+                    new EmbedBuilder().WithDescription($"Flag dismissed by {MentionUtils.MentionUser(@event.ResolvedBy)}").Build()
                 };
             });
         }

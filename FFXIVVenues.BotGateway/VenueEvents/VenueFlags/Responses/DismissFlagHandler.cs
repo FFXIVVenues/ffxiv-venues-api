@@ -33,8 +33,8 @@ public class DismissFlagHandler(
             return;
         }
 
-        await flagServiceClient.ResolveFlagAsync(flagId, userId);
-        await context.Interaction.FollowupAsync("Flag resolved, thankies!", ephemeral: true);
+        await flagServiceClient.DismissFlagAsync(flagId, userId);
+        await context.Interaction.FollowupAsync("Flag dismissed, mew!", ephemeral: true);
     }
     
 }
