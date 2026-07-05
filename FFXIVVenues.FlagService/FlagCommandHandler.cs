@@ -24,10 +24,10 @@ public class FlagCommandHandler(IMessageBus bus, DomainDataContext domainData, I
         
         var recentFlagsFromAddress = domainData.Flags.Any(f => 
             f.SourceAddress == sourceAddress && 
-            f.Timestamp > DateTimeOffset.UtcNow.AddMinutes(-3)); 
+            f.Timestamp > DateTimeOffset.UtcNow.AddMinutes(-1)); 
         if (recentFlagsFromAddress) 
         {
-            logger.LogInformation("Rejecting flag, {SourceAddress} flagged in last 3 minutes", sourceAddress);
+            logger.LogInformation("Rejecting flag, {SourceAddress} flagged in last 1 minutes", sourceAddress);
             return ValueTask.CompletedTask;
         }
         
@@ -55,10 +55,11 @@ public class FlagCommandHandler(IMessageBus bus, DomainDataContext domainData, I
         logger.LogInformation("Flag for venue {VenueId} from {SourceAddress} saved", command.VenueId, sourceAddress);
         
         return bus.PublishAsync(new VenueFlaggedEvent(
-            command.VenueId,
+            flag.Id,
             command.Category,
             command.Description,
-            sourceAddress.Substring(0, 10)
+            sourceAddress,
+            flag
         ));
     }
 }

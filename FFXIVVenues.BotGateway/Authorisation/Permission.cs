@@ -55,6 +55,11 @@ public enum Permission
         DeleteEuVenue,
         DeleteOceVenue,
         DeleteJpnVenue,
+    RespondToFlags,
+        RespondToNaFlags,
+        RespondToEuFlags,
+        RespondToOceFlags,
+        RespondToJpnFlags,
     Blacklist,
     ControlMassAudit,
     ReportMassAudit,
@@ -155,6 +160,15 @@ public static class PermissionExtensions
                     FfxivWorlds.REGION_EU  => Permission.DeleteEuVenue,  
                     FfxivWorlds.REGION_OCE => Permission.DeleteOceVenue,
                     FfxivWorlds.REGION_JPN => Permission.DeleteJpnVenue,
+                    _ => null
+                },
+            Permission.RespondToFlags =>
+                FfxivWorlds.GetRegionForDataCenter(venue.Location?.DataCenter) switch
+                {
+                    FfxivWorlds.REGION_NA => Permission.RespondToNaFlags,
+                    FfxivWorlds.REGION_EU => Permission.RespondToEuFlags,
+                    FfxivWorlds.REGION_OCE => Permission.RespondToOceFlags,
+                    FfxivWorlds.REGION_JPN => Permission.RespondToJpnFlags,
                     _ => null
                 },
             _ => null

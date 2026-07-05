@@ -10,6 +10,8 @@ public class DismissFlagCommandHandler(IMessageBus bus, DomainDataContext domain
 {
     public ValueTask Handle(DismissFlagCommand command)
     {
+        logger.LogInformation("Handling dismiss of flag {FlagId} from {UserId}", command.FlagId, command.DismissedBy);
+
         var flag = domainData.Flags.FirstOrDefault(f => f.Id == command.FlagId);
         if (flag == null)
         {
@@ -27,8 +29,8 @@ public class DismissFlagCommandHandler(IMessageBus bus, DomainDataContext domain
         
         return bus.PublishAsync(new FlagDismissedEvent(
             command.FlagId,
-            flag.VenueId,
-            command.DismissedBy
+            command.DismissedBy,
+            flag
         ));
     }
 }

@@ -1,3 +1,3 @@
 namespace FFXIVVenues.FlagService.Client.Commands;
 
-public record ResolveFlagCommand(string FlagId, long ResolvedBy);
+public record ResolveFlagCommand(string FlagId, ulong ResolvedBy);

@@ -29,6 +29,8 @@ using FFXIVVenues.BotGateway.Infrastructure.Intent;
 using FFXIVVenues.BotGateway.Infrastructure.Presence;
 using FFXIVVenues.BotGateway.UserSupport;
 using FFXIVVenues.BotGateway.VenueDiscovery.Commands;
+using FFXIVVenues.BotGateway.VenueEvents.VenueFlags;
+using FFXIVVenues.FlagService.Client;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -65,6 +67,8 @@ builder.Services.AddSingleton<MassDeleteService>();
 builder.Services.AddSingleton<IDiscordValidator, DiscordValidator>();
 builder.Services.AddSingleton<ISiteValidator, SiteValidator>();
 builder.Services.AddSingleton<IActivityManager, ActivityManager>();
+builder.Services.AddSingleton<IVenueFlagRenderer, VenueFlagRenderer>();
+builder.Services.AddSingleton<IFlagServiceClient, FlagServiceClient>();
 
 builder.Services.AddHostedService<DiscordHostedService>();
 
@@ -84,7 +88,8 @@ app.Services.GetService<IComponentBroker>()
     .AddVenueObservationHandlers()
     .AddVenueAuditingHandlers()
     .AddVenueControlHandlers()
-    .AddVenueRenderingHandlers();
+    .AddVenueRenderingHandlers()
+    .AddVenueFlagHandlers();
 
 _ = app.Services.GetService<IApiObservationService>()
     .AddVenueObservers()
