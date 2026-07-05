@@ -5,16 +5,15 @@ using FFXIVVenues.BotGateway.Infrastructure.Components;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
 using FFXIVVenues.BotGateway.Utils;
 using FFXIVVenues.BotGateway.VenueEvents.VenueFlags.Responses;
-using FFXIVVenues.BotGateway.VenueRendering;
 using FFXIVVenues.FlagService.Client.Events;
 using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags;
+namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags.Events;
 
-public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, IApiService apiService, UiConfiguration uiConfig)
+public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, IApiService apiService, IVenueFlagRenderer flagRenderer)
 {
     public async Task Handle(VenueFlaggedEvent @event)
     {
@@ -23,26 +22,13 @@ public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, 
         if (!streams.Any()) 
             return;
         
-        var venue = await apiService.GetVenueAsync(@event.VenueId);
+        var venue = await apiService.GetVenueAsync(@event.Flag.VenueId);
         if (venue == null) return;
 
-        var flagDistribution = new VenueFlagDistribution(@event.FlagId)
-        {
-            VenueId = venue.Id,
-        };
-        
-        var embed = new EmbedBuilder()
-            .WithTitle(venue.Name)
-            .WithAuthor("Venue Flagged")
-            .WithUrl(uiConfig.BaseUrl + "/venue/" + venue.Id)
-            .WithDescription(
-                $"""
-                **Category: **{@event.Category}
-                **Region: **{FfxivWorlds.GetRegionForDataCenter(venue.Location.DataCenter)}
-                {(@event.Description is not null ? "**Description: **" + @event.Description : "")}
-                """)
-            .WithFooter(@event.From)
-            .WithColor(Color.Red);
+        var region = FfxivWorlds.GetRegionForDataCenter(venue.Location.DataCenter);
+        var regionFlag = FfxivWorlds.GetFlagForRegion(region);
+        var text = $"Flag received for a venue in {regionFlag} {region}";
+        var flagEmbed = flagRenderer.RenderFlag(venue, @event.Flag).Build();
         
         var builder = new ComponentBuilder();
         var dropDown = new SelectMenuBuilder()
@@ -63,6 +49,7 @@ public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, 
 
         builder.WithSelectMenu(dropDown);
         
+        var flagDistribution = new VenueFlagDistribution(@event.FlagId, @event.Flag);
         foreach (var stream in streams)
         {
             var channel = await client.GetChannelAsync(stream.ChannelId);
@@ -75,7 +62,7 @@ public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, 
 
             try
             {
-                var message = await socketTextChannel.SendMessageAsync(embed: embed.Build(), components: builder.Build());
+                var message = await socketTextChannel.SendMessageAsync(text, embeds: [ flagEmbed], components: builder.Build());
                 flagDistribution.Messages.Add(new (stream.ChannelId, message.Id));
             }
             catch (Exception e)

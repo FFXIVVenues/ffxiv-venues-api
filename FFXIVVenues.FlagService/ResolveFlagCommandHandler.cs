@@ -27,8 +27,8 @@ public class ResolveFlagCommandHandler(IMessageBus bus, DomainDataContext domain
         
         return bus.PublishAsync(new FlagResolvedEvent(
             command.FlagId,
-            flag.VenueId,
-            command.ResolvedBy
+            command.ResolvedBy,
+            flag
         ));
     }
 }
