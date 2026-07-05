@@ -18,15 +18,15 @@
     <Compile Remove="NDependOut\**" />
     <EmbeddedResource Remove="NDependOut\**" />
     <None Remove="NDependOut\**" />
-    <EmbeddedResource Update="Auditing\AuditStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>AuditStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <Compile Update="Auditing\AuditStrings.Designer.cs">
+    <Compile Update="VenueAuditing\AuditStrings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>AuditStrings.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Update="VenueAuditing\AuditStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AuditStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="VenueControl\VenueControlStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>VenueControlStrings.Designer.cs</LastGenOutput>

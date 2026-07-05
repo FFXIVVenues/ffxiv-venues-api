@@ -1,4 +1,4 @@
-﻿ using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using FFXIVVenues.BotGateway.Api;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
