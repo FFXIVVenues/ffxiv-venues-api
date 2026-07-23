@@ -1,6 +1,4 @@
 ﻿using Discord;
-using FFXIVVenues.BotGateway.Utils;
-using FFXIVVenues.BotGateway.VenueAuditing;
 using FFXIVVenues.BotGateway.VenueRendering;
 using FFXIVVenues.DomainData.Entities.Flags;
 using FFXIVVenues.VenueModels;

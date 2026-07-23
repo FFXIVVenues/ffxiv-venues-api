@@ -26,7 +26,8 @@ public class DismissFlagCommandHandler(IMessageBus bus, DomainDataContext domain
         domainData.SaveChanges();
         
         logger.LogInformation("Flag {FlagId} for venue {VenueId} dismissed", flag.Id, flag.VenueId);
-        
+
+        logger.LogDebug("Emitting flag dismissed event for flag {FlagId} for venue {VenueId}", flag.Id, flag.VenueId);
         return bus.PublishAsync(new FlagDismissedEvent(
             command.FlagId,
             command.DismissedBy,

@@ -38,7 +38,7 @@ public class FlagCommandHandler(IMessageBus bus, DomainDataContext domainData, I
             f.Timestamp > DateTimeOffset.UtcNow.AddHours(-20));
         if (recentFlagsForVenueFromAddress)
         {
-            logger.LogInformation("Rejecting flag, {SourceAddress} flagged venue {VenueId} in last 20 hours", command.VenueId, sourceAddress);
+            logger.LogInformation("Rejecting flag, {SourceAddress} flagged venue {VenueId} in last 20 hours", sourceAddress, command.VenueId);
             return ValueTask.CompletedTask;
         }
 
@@ -52,8 +52,9 @@ public class FlagCommandHandler(IMessageBus bus, DomainDataContext domainData, I
         logger.LogDebug("Flag for venue {VenueId} from {SourceAddress} accepted, saving", command.VenueId, sourceAddress);
         domainData.Flags.Add(flag);
         domainData.SaveChanges();
-        logger.LogInformation("Flag for venue {VenueId} from {SourceAddress} saved", command.VenueId, sourceAddress);
-        
+        logger.LogInformation("Flag {FlagId} for venue {VenueId} from {SourceAddress} saved", flag.Id, command.VenueId, sourceAddress);
+
+        logger.LogDebug("Emitting venue flagged event for flag {FlagId} for venue {VenueId}", flag.Id, command.VenueId);
         return bus.PublishAsync(new VenueFlaggedEvent(
             flag.Id,
             command.Category,

@@ -26,7 +26,8 @@ public class ResolveFlagCommandHandler(IMessageBus bus, DomainDataContext domain
         domainData.SaveChanges();
         
         logger.LogInformation("Flag {FlagId} for venue {VenueId} resolved", flag.Id, flag.VenueId);
-        
+
+        logger.LogDebug("Emitting flag resolved event for flag {FlagId} for venue {VenueId}", flag.Id, flag.VenueId);
         return bus.PublishAsync(new FlagResolvedEvent(
             command.FlagId,
             command.ResolvedBy,

@@ -62,7 +62,7 @@ public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, 
 
             try
             {
-                var message = await socketTextChannel.SendMessageAsync(text, embeds: [ flagEmbed], components: builder.Build());
+                var message = await socketTextChannel.SendMessageAsync(text, embeds: [ flagEmbed ], components: builder.Build());
                 flagDistribution.Messages.Add(new (stream.ChannelId, message.Id));
             }
             catch (Exception e)
