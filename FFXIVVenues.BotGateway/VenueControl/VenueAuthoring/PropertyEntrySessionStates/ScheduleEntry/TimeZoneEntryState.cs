@@ -20,7 +20,7 @@ class TimeZoneEntrySessionState : ISessionState
     public Task Enter(VeniInteractionContext c)
     {
         var component = new ComponentBuilder();
-        var timezoneOptions = TimeZones.SupportedTimeZones.Select(dc => new SelectMenuOptionBuilder(dc.TimeZoneLabel, dc.TimeZoneKey)).ToList();
+        var timezoneOptions = TimeZones.SupportedTimeZones.Select(dc => new SelectMenuOptionBuilder(dc.TimeZoneLabel, dc.TimeZoneKey, dc.TimeZoneDescription)).ToList();
         var selectMenu = new SelectMenuBuilder();
         selectMenu.WithOptions(timezoneOptions);
         selectMenu.WithCustomId(c.Session.RegisterComponentHandler(Handle, ComponentPersistence.ClearRow));

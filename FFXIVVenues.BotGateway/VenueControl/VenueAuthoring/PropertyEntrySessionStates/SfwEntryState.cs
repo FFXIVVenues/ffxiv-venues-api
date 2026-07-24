@@ -26,8 +26,10 @@ namespace FFXIVVenues.BotGateway.VenueControl.VenueAuthoring.PropertyEntrySessio
                 .WithCustomId(c.Session.RegisterComponentHandler(OnComplete, ComponentPersistence.ClearRow))
                 .WithMaxValues(1);
 
+            var @default = c.Session.InEditing() ? venue.Sfw : true;
+
             foreach (var (label, description, value, emote) in _options)
-                selectComponent.AddOption(label, value.ToString(), isDefault: venue.Sfw == value, description: description, emote: new Emoji(emote));
+                selectComponent.AddOption(label, value.ToString(), isDefault: @default == value, description: description, emote: new Emoji(emote));
 
             return c.Interaction.RespondAsync(MessageRepository.AskForSfwMessage.PickRandom(), new ComponentBuilder()
                 .WithSelectMenu(selectComponent)

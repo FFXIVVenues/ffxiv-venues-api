@@ -25,7 +25,7 @@ public static class FfxivWorlds
         { REGION_NA, true },
         { REGION_OCE, true },
         { REGION_EU, true },
-        { REGION_JPN, false },
+        { REGION_JPN, true },
     };
 
     private static readonly Dictionary<string, string[]> DataCenterMap = new()

@@ -9,6 +9,8 @@ using FFXIVVenues.BotGateway.Infrastructure.Commands.Attributes;
 
 namespace FFXIVVenues.BotGateway.GuildEngagement;
 
+
+//Elemental", "Gaia", "Mana", "Meteor
 [DiscordCommand("server managerrole set", "Set role to assign to venue managers of the specified Data Center.", GuildPermission.ManageRoles, InteractionContextType.Guild)]
 [DiscordCommandOption("datacenter", "The data center to assign the given role to.", ApplicationCommandOptionType.String)]
 [DiscordCommandOptionChoice("datacenter", "Crystal", "Crystal")]
@@ -18,6 +20,10 @@ namespace FFXIVVenues.BotGateway.GuildEngagement;
 [DiscordCommandOptionChoice("datacenter", "Materia", "Materia")]
 [DiscordCommandOptionChoice("datacenter", "Light", "Light")]
 [DiscordCommandOptionChoice("datacenter", "Chaos", "Chaos")]
+[DiscordCommandOptionChoice("datacenter", "Elemental", "Elemental")]
+[DiscordCommandOptionChoice("datacenter", "Gaia", "Gaia")]
+[DiscordCommandOptionChoice("datacenter", "Mana", "Mana")]
+[DiscordCommandOptionChoice("datacenter", "Meteor", "Meteor")]
 [DiscordCommandOption("role", "The role to assign the user when they own a venue in the specified data center.", ApplicationCommandOptionType.Role)]
 public class SetManageRoleCommand(IRepository repository) : ICommandHandler
 {
