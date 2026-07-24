@@ -27,9 +27,9 @@ namespace FFXIVVenues.DomainData.Entities.Venues;
 public class Location
 {
     public string Id { get; set; } = IdHelper.GenerateId(8);
-    public string DataCenter { get; set; }
-    public string World { get; set; }
-    public string District { get; set; }
+    public string? DataCenter { get; set; }
+    public string? World { get; set; }
+    public string? District { get; set; }
     public ushort Ward { get; set; }
     public ushort Plot { get; set; }
     public ushort Apartment { get; set; }
