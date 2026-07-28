@@ -25,5 +25,8 @@ namespace FFXIVVenues.BotGateway.Utils
             return message.Split('\n').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
         }
 
+        public static string Fmt(this string message, params object[] args) =>
+            string.Format(message, args);
+
     }
 }

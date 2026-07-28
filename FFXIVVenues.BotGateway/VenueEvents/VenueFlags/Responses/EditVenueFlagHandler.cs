@@ -1,25 +1,21 @@
-using Discord;
+﻿using Discord;
 using FFXIVVenues.BotGateway.Api;
 using FFXIVVenues.BotGateway.Authorisation;
+using FFXIVVenues.BotGateway.Infrastructure.Components;
 using FFXIVVenues.BotGateway.Infrastructure.Context;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
-using FFXIVVenues.BotGateway.VenueAuditing.ComponentHandlers.AuditResponse;
+using FFXIVVenues.BotGateway.VenueControl;
+using FFXIVVenues.BotGateway.VenueControl.VenueAuthoring.VenueEditing.SessionStates;
 using FFXIVVenues.FlagService.Client;
 using System.Threading.Tasks;
 
 namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags.Responses;
 
-public class DismissFlagHandler(
-    IRepository repository,
-    IApiService apiService,
-    IAuthorizer authorizer,
-    IFlagServiceClient flagServiceClient)
-    : BaseAuditHandler
+public class EditVenueFlagHandler(IFlagServiceClient flagServiceClient, IRepository repository, IApiService apiService, IAuthorizer authorizer) : IComponentHandler
 {
-    
-    public static string Key => "FLAG_RESPONSE_DISMISS";
+    public static string Key => "FLAG_RESPONSE_EDIT_VENUE";
 
-    public override async Task HandleAsync(ComponentVeniInteractionContext context, string[] args)
+    public async Task HandleAsync(ComponentVeniInteractionContext context, string[] args)
     {
         var flagId = args[0];
         var userId = context.Interaction.User.Id;
@@ -33,8 +29,9 @@ public class DismissFlagHandler(
             return;
         }
 
-        await flagServiceClient.DismissFlagAsync(flagId, userId);
-        await context.Interaction.FollowupAsync(FlagStrings.FlagDismissed, flags: MessageFlags.Ephemeral);
+        await flagServiceClient.ResolveFlagAsync(flagId, userId);
+
+        context.Session.SetVenue(venue);
+        await context.Session.MoveStateAsync<EditVenueSessionState>(context);
     }
-    
 }

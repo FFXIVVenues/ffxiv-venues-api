@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CloseVenue" xml:space="preserve">
+    <value>Close Venue</value>
+  </data>
+  <data name="CloseVenueDescription" xml:space="preserve">
+    <value>Put this venue on a hiatus for up to 3 months.</value>
+  </data>
+  <data name="CouldNotForward" xml:space="preserve">
+    <value>I couldn't forward the flag to any managers. 🥲</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. This shows when the owner/managers of the venue are uncontactable for some reason.</comment>
+  </data>
+  <data name="DismissFlag" xml:space="preserve">
+    <value>Dismiss Flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="DismissFlagDescription" xml:space="preserve">
+    <value>Dismiss the flag as needing no action.</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="EditVenue" xml:space="preserve">
+    <value>Edit Venue</value>
+  </data>
+  <data name="EditVenueDescription" xml:space="preserve">
+    <value>Update the details on this venue.</value>
+  </data>
+  <data name="FlagDismissed" xml:space="preserve">
+    <value>Flag dismissed, mew!</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="FlagReceived" xml:space="preserve">
+    <value>Meow! We've received a flag about your venue, could you take a lookie please! ♥</value>
+  </data>
+  <data name="FlagResolved" xml:space="preserve">
+    <value>Flag resolved, thankies!</value>
+  </data>
+  <data name="ForwardFlag" xml:space="preserve">
+    <value>Forward Flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
+  </data>
+  <data name="ForwardFlagDescription" xml:space="preserve">
+    <value>Forward the flag to venue owners/managers for actioning.</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
+  </data>
+  <data name="ForwardedFlagTo" xml:space="preserve">
+    <value>I've forwarded the flag to {0}! 😊</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} will be the name of the owner(s) that the flag was forwarded to. </comment>
+  </data>
+  <data name="NoPermission" xml:space="preserve">
+    <value>Sorry, you don't have permission to do that. 🥲</value>
+  </data>
+  <data name="PermanentlyClose" xml:space="preserve">
+    <value>Permanently Close / Delete</value>
+  </data>
+  <data name="PermanentlyCloseDescription" xml:space="preserve">
+    <value>Delete this venue completely.</value>
+  </data>
+  <data name="ResolveFlag" xml:space="preserve">
+    <value>Resolve Flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
+  </data>
+  <data name="SelectResponse" xml:space="preserve">
+    <value>Select response</value>
+    <comment>In the context of selecting a response to a flag, a flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="UserDismissedFlag" xml:space="preserve">
+    <value>❎ {0} dismissed the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} is the discord name of the user that dismissed the flag. It'll be clickable. </comment>
+  </data>
+  <data name="UserForwardedFlag" xml:space="preserve">
+    <value>⏩ {0} forwarded the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} is the discord name of the user that forwarded the flag. It'll be clickable. </comment>
+  </data>
+  <data name="UserResolvedFlag" xml:space="preserve">
+    <value>✅ {0} resolved the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} is the discord name of the user that resolved the flag. It'll be clickable. </comment>
+  </data>
+  <data name="VenueFlaggedInappropriateContent" xml:space="preserve">
+    <value>Venue Flagged: Inappropriate content</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="VenueFlaggedInfoIncorrect" xml:space="preserve">
+    <value>Venue Flagged: Site information incorrect</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="VenueFlaggedVenueEmpty" xml:space="preserve">
+    <value>Venue Flagged: Venue empty</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. "Venue empty" described that the venue had no one in the property at the time it was supposed to be open. </comment>
+  </data>
+  <data name="YouDismissedFlag" xml:space="preserve">
+    <value>❎ You dismissed the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="YouResolvedFlag" xml:space="preserve">
+    <value>✅ You resolved the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="ResolveFlagDescription" xml:space="preserve">
+    <value>The flag has been handled with corrective actions.</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
+  </data>
+</root>

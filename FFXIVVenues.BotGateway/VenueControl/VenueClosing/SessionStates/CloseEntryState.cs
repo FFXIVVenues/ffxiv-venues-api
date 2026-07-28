@@ -6,6 +6,7 @@ using FFXIVVenues.BotGateway.Infrastructure.Context;
 using FFXIVVenues.BotGateway.Infrastructure.Context.SessionHandling;
 using FFXIVVenues.BotGateway.Utils;
 using FFXIVVenues.BotGateway.VenueControl;
+using FFXIVVenues.BotGateway.VenueControl.VenueDeletion.SessionStates;
 using FFXIVVenues.BotGateway.VenueControl.VenueOpening.SessionStates;
 
 namespace FFXIVVenues.BotGateway.VenueControl.VenueClosing.SessionStates;
@@ -45,7 +46,9 @@ internal class CloseEntryState : ISessionState
         
         if (hasFutureClosure)
             selectComponent.AddOption("Cancel future closure", "CancelClosure");
-        
+
+        selectComponent.AddOption("Permanently Close (Delete)", "PermanentlyClose");
+
         return new ComponentBuilder().WithSelectMenu(selectComponent).WithBackButton(c);
     }
 
@@ -63,6 +66,7 @@ internal class CloseEntryState : ISessionState
             "Extend" => c.Session.MoveStateAsync<CloseHowLongWhenEntryState>(c),
             "Now" => c.Session.MoveStateAsync<CloseHowLongWhenEntryState>(c),
             "Later" => c.Session.MoveStateAsync<CloseTimeZoneEntryState>(c),
+            "PermanentlyClose" => c.Session.MoveStateAsync<DeleteVenueSessionState>(c),
             _ => throw new ArgumentOutOfRangeException()
         };
     }

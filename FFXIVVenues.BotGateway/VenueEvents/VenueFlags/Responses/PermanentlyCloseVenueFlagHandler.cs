@@ -4,15 +4,18 @@ using FFXIVVenues.BotGateway.Authorisation;
 using FFXIVVenues.BotGateway.Infrastructure.Components;
 using FFXIVVenues.BotGateway.Infrastructure.Context;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
+using FFXIVVenues.BotGateway.VenueControl;
+using FFXIVVenues.BotGateway.VenueControl.VenueAuthoring.VenueEditing.SessionStates;
+using FFXIVVenues.BotGateway.VenueControl.VenueClosing.SessionStates;
+using FFXIVVenues.BotGateway.VenueControl.VenueDeletion.SessionStates;
 using FFXIVVenues.FlagService.Client;
 using System.Threading.Tasks;
 
 namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags.Responses;
 
-public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepository repository, IApiService apiService, IAuthorizer authorizer) : IComponentHandler
+public class PermanentlyCloseVenueFlagHandler(IFlagServiceClient flagServiceClient, IRepository repository, IApiService apiService, IAuthorizer authorizer) : IComponentHandler
 {
-    public static string Key => "FLAG_RESPONSE_RESOLVE";
-
+    public static string Key => "FLAG_RESPONSE_PERM_CLOSE_VENUE";
 
     public async Task HandleAsync(ComponentVeniInteractionContext context, string[] args)
     {
@@ -29,6 +32,8 @@ public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepositor
         }
 
         await flagServiceClient.ResolveFlagAsync(flagId, userId);
-        await context.Interaction.FollowupAsync(FlagStrings.FlagResolved, flags: MessageFlags.Ephemeral);
+
+        context.Session.SetVenue(venue);
+        await context.Session.MoveStateAsync<DeleteVenueSessionState>(context);
     }
 }
