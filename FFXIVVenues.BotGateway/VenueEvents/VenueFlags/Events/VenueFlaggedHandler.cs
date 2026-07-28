@@ -27,28 +27,9 @@ public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, 
 
         var region = FfxivWorlds.GetRegionForDataCenter(venue.Location.DataCenter);
         var regionFlag = FfxivWorlds.GetFlagForRegion(region);
-        var text = $"Flag received for a venue in {regionFlag} {region}";
         var flagEmbed = flagRenderer.RenderFlag(venue, @event.Flag).Build();
-        
-        var builder = new ComponentBuilder();
-        var dropDown = new SelectMenuBuilder()
-            .WithValueHandlers()
-            .WithPlaceholder("What would you like to do?");
-        
-        dropDown.AddOption(new SelectMenuOptionBuilder()
-            .WithLabel("Resolve")
-            .WithEmote(new Emoji("✅"))
-            .WithDescription("The flag has been handled with corrective actions.")
-            .WithStaticHandler(ResolveFlagHandler.Key, @event.FlagId));
+        var options = flagRenderer.RenderFlagOptions(@event.Flag).Build();
 
-        dropDown.AddOption(new SelectMenuOptionBuilder()
-            .WithLabel("Dismiss")
-            .WithEmote(new Emoji("❌"))
-            .WithDescription("The flag needs no action.")
-            .WithStaticHandler(DismissFlagHandler.Key, @event.FlagId));
-
-        builder.WithSelectMenu(dropDown);
-        
         var flagDistribution = new VenueFlagDistribution(@event.FlagId, @event.Flag);
         foreach (var stream in streams)
         {
@@ -62,7 +43,7 @@ public class VenueFlaggedHandler(IRepository repository, IDiscordClient client, 
 
             try
             {
-                var message = await socketTextChannel.SendMessageAsync(text, embeds: [ flagEmbed ], components: builder.Build());
+                var message = await socketTextChannel.SendMessageAsync($"{regionFlag} {region}", embeds: [ flagEmbed], components: options);
                 flagDistribution.Messages.Add(new (stream.ChannelId, message.Id));
             }
             catch (Exception e)

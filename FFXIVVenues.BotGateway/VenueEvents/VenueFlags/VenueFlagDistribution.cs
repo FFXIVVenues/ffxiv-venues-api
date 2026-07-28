@@ -2,6 +2,7 @@
 using FFXIVVenues.DomainData.Entities.Flags;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Collections.Generic;
+using System.Security;
 
 namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags;
 

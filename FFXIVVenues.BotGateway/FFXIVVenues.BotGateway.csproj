@@ -23,6 +23,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>AuditStrings.resx</DependentUpon>
     </Compile>
+    <Compile Update="VenueEvents\VenueFlags\FlagStrings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FlagStrings.resx</DependentUpon>
+    </Compile>
     <EmbeddedResource Update="VenueAuditing\AuditStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AuditStrings.Designer.cs</LastGenOutput>
@@ -48,6 +53,10 @@
     <EmbeddedResource Update="AI\Davinci\ContextStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ContextStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="VenueEvents\VenueFlags\FlagStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FlagStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Compile Update="AI\Davinci\ContextStrings.Designer.cs">
       <DesignTime>True</DesignTime>

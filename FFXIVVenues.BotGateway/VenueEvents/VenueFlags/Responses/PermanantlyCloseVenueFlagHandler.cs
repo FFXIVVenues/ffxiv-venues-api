@@ -4,15 +4,18 @@ using FFXIVVenues.BotGateway.Authorisation;
 using FFXIVVenues.BotGateway.Infrastructure.Components;
 using FFXIVVenues.BotGateway.Infrastructure.Context;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
+using FFXIVVenues.BotGateway.VenueControl;
+using FFXIVVenues.BotGateway.VenueControl.VenueAuthoring.VenueEditing.SessionStates;
+using FFXIVVenues.BotGateway.VenueControl.VenueClosing.SessionStates;
+using FFXIVVenues.BotGateway.VenueControl.VenueDeletion.SessionStates;
 using FFXIVVenues.FlagService.Client;
 using System.Threading.Tasks;
 
 namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags.Responses;
 
-public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepository repository, IApiService apiService, IAuthorizer authorizer) : IComponentHandler
+public class PermanantlyCloseVenueFlagHandler(IFlagServiceClient flagServiceClient, IRepository repository, IApiService apiService, IAuthorizer authorizer) : IComponentHandler
 {
-    public static string Key => "RESOLVE_FLAG";
-
+    public static string Key => "FLAG_RESPONSE_PERM_CLOSE_VENUE";
 
     public async Task HandleAsync(ComponentVeniInteractionContext context, string[] args)
     {
@@ -24,11 +27,13 @@ public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepositor
 
         if (!authorizer.Authorize(context.Interaction.User.Id, Permission.RespondToFlags, venue).Authorized)
         {
-            await context.Interaction.Message.ReplyAsync("Sorry, you don't have permission to do that. 🥲", flags: MessageFlags.Ephemeral);
+            await context.Interaction.Message.ReplyAsync(FlagStrings.NoPermission, flags: MessageFlags.Ephemeral);
             return;
         }
 
         await flagServiceClient.ResolveFlagAsync(flagId, userId);
-        await context.Interaction.FollowupAsync("Flag resolved, thankies!", flags: MessageFlags.Ephemeral);
+
+        context.Session.SetVenue(venue);
+        await context.Session.MoveStateAsync<DeleteVenueSessionState>(context);
     }
 }
