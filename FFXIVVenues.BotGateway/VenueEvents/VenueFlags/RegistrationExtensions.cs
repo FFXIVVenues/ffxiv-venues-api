@@ -13,7 +13,12 @@ public static class RegistrationExtensions
 
         componentBroker.Add<DismissFlagHandler>(DismissFlagHandler.Key);
         componentBroker.Add<ResolveFlagHandler>(ResolveFlagHandler.Key);
-        
+        componentBroker.Add<ForwardFlagHandler>(ForwardFlagHandler.Key);
+
+        componentBroker.Add<EditVenueFlagHandler>(EditVenueFlagHandler.Key);
+        componentBroker.Add<TemporarilyCloseVenueFlagHandler>(TemporarilyCloseVenueFlagHandler.Key);
+        componentBroker.Add<PermanantlyCloseVenueFlagHandler>(PermanantlyCloseVenueFlagHandler.Key);
+
         return componentBroker;
     }
 }
