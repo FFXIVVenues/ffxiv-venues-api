@@ -5,6 +5,7 @@ using FFXIVVenues.BotGateway.Authorisation;
 using FFXIVVenues.BotGateway.Infrastructure.Components;
 using FFXIVVenues.BotGateway.Infrastructure.Context;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
+using FFXIVVenues.BotGateway.Utils;
 using FFXIVVenues.BotGateway.Utils.Broadcasting;
 using FFXIVVenues.BotGateway.VenueAuditing;
 using FFXIVVenues.BotGateway.VenueAuditing.ComponentHandlers.AuditResponse;
@@ -43,26 +44,26 @@ public class ForwardFlagHandler(IVenueFlagRenderer flagRenderer, IDiscordClient 
                .WithComponent(ctx => new ComponentBuilder()
                    .WithSelectMenu(new SelectMenuBuilder()
                        .WithValueHandlers()
-                       .WithPlaceholder("Select response")
+                       .WithPlaceholder(FlagStrings.SelectResponse)
                        .AddOption(new SelectMenuOptionBuilder()
-                           .WithLabel("Dismiss Flag")
+                           .WithLabel(FlagStrings.DismissFlag)
                            .WithEmote(new Emoji("❎"))
-                           .WithDescription("Dismiss the flag as needing no action.")
+                           .WithDescription(FlagStrings.DismissFlagDescription)
                            .WithStaticHandler(DismissFlagHandler.Key, flag.id))
                        .AddOption(new SelectMenuOptionBuilder()
-                           .WithLabel("Edit Venue")
+                           .WithLabel(FlagStrings.EditVenue)
                            .WithEmote(new Emoji("✏️"))
-                           .WithDescription("Update the details on this venue.")
+                           .WithDescription(FlagStrings.EditVenueDescription)
                            .WithStaticHandler(EditVenueFlagHandler.Key, flag.id))
                        .AddOption(new SelectMenuOptionBuilder()
-                           .WithLabel("Close Venue")
+                           .WithLabel(FlagStrings.CloseVenue)
                            .WithEmote(new Emoji("🔒"))
-                           .WithDescription("Put this venue on a hiatus for up to 3 months.")
+                           .WithDescription(FlagStrings.CloseVenueDescription)
                            .WithStaticHandler(TemporarilyCloseVenueFlagHandler.Key, flag.id))
                        .AddOption(new SelectMenuOptionBuilder()
-                            .WithLabel("Permanently Close / Delete")
+                            .WithLabel(FlagStrings.PermanentlyClose)
                             .WithEmote(new Emoji("❌"))
-                            .WithDescription("Delete this venue completely.")
+                            .WithDescription(FlagStrings.PermanentlyCloseDescription)
                             .WithStaticHandler(PermanentlyCloseVenueFlagHandler.Key, flag.id))
                        ));
         var broadcastReceipt = await broadcast.SendToAsync(venue.Managers.Select(ulong.Parse).ToArray());
@@ -72,11 +73,12 @@ public class ForwardFlagHandler(IVenueFlagRenderer flagRenderer, IDiscordClient 
 
         if (!successful.Any())
         {
-            await context.Interaction.FollowupAsync("I couldn't forward the flag to any managers. 🥲", flags: MessageFlags.Ephemeral);
+            await context.Interaction.FollowupAsync(FlagStrings.CouldNotForward, flags: MessageFlags.Ephemeral);
             return;
         }
 
-        await context.Interaction.FollowupAsync($"I've forwarded the flag to {string.Join(",", successful.Select(MentionUtils.MentionUser))}! 😊", flags: MessageFlags.Ephemeral);
+        var flagForwardedMessage = FlagStrings.ForwardedFlagTo.Fmt(string.Join(",", successful.Select(MentionUtils.MentionUser)));
+        await context.Interaction.FollowupAsync(flagForwardedMessage, flags: MessageFlags.Ephemeral);
         foreach (var message in flag.Messages)
         {
             var channel = await discordClient.GetChannelAsync(message.ChannelId);
@@ -91,7 +93,7 @@ public class ForwardFlagHandler(IVenueFlagRenderer flagRenderer, IDiscordClient 
                 props.Embeds = new[]
                 {
                     flagEmbed.Build(),
-                    new EmbedBuilder().WithDescription($"{MentionUtils.MentionUser(userId)} forwarded the flag").Build(),
+                    new EmbedBuilder().WithDescription(FlagStrings.UserForwardedFlag.Fmt(MentionUtils.MentionUser(userId))).Build(),
                 };
                 props.Components = flagOptionsComponent;
             });

@@ -61,6 +61,78 @@ namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close Venue.
+        /// </summary>
+        internal static string CloseVenue {
+            get {
+                return ResourceManager.GetString("CloseVenue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Put this venue on a hiatus for up to 3 months..
+        /// </summary>
+        internal static string CloseVenueDescription {
+            get {
+                return ResourceManager.GetString("CloseVenueDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t forward the flag to any managers. 🥲.
+        /// </summary>
+        internal static string CouldNotForward {
+            get {
+                return ResourceManager.GetString("CouldNotForward", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dismiss Flag.
+        /// </summary>
+        internal static string DismissFlag {
+            get {
+                return ResourceManager.GetString("DismissFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dismiss the flag as needing no action..
+        /// </summary>
+        internal static string DismissFlagDescription {
+            get {
+                return ResourceManager.GetString("DismissFlagDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit Venue.
+        /// </summary>
+        internal static string EditVenue {
+            get {
+                return ResourceManager.GetString("EditVenue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update the details on this venue..
+        /// </summary>
+        internal static string EditVenueDescription {
+            get {
+                return ResourceManager.GetString("EditVenueDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Flag dismissed, mew!.
+        /// </summary>
+        internal static string FlagDismissed {
+            get {
+                return ResourceManager.GetString("FlagDismissed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Meow! We&apos;ve received a flag about your venue, could you take a lookie please! ♥.
         /// </summary>
         internal static string FlagReceived {
@@ -70,11 +142,164 @@ namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Flag resolved, thankies!.
+        /// </summary>
+        internal static string FlagResolved {
+            get {
+                return ResourceManager.GetString("FlagResolved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve forwarded the flag to {0}! 😊.
+        /// </summary>
+        internal static string ForwardedFlagTo {
+            get {
+                return ResourceManager.GetString("ForwardedFlagTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forward Flag.
+        /// </summary>
+        internal static string ForwardFlag {
+            get {
+                return ResourceManager.GetString("ForwardFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forward the flag to venue owners/managers for actioning..
+        /// </summary>
+        internal static string ForwardFlagDescription {
+            get {
+                return ResourceManager.GetString("ForwardFlagDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sorry, you don&apos;t have permission to do that. 🥲.
         /// </summary>
         internal static string NoPermission {
             get {
                 return ResourceManager.GetString("NoPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permanently Close / Delete.
+        /// </summary>
+        internal static string PermanentlyClose {
+            get {
+                return ResourceManager.GetString("PermanentlyClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete this venue completely..
+        /// </summary>
+        internal static string PermanentlyCloseDescription {
+            get {
+                return ResourceManager.GetString("PermanentlyCloseDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resolve Flag.
+        /// </summary>
+        internal static string ResolveFlag {
+            get {
+                return ResourceManager.GetString("ResolveFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The flag has been handled with corrective actions..
+        /// </summary>
+        internal static string ResolveFlagDescription {
+            get {
+                return ResourceManager.GetString("ResolveFlagDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select response.
+        /// </summary>
+        internal static string SelectResponse {
+            get {
+                return ResourceManager.GetString("SelectResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ❎ {0} dismissed the flag.
+        /// </summary>
+        internal static string UserDismissedFlag {
+            get {
+                return ResourceManager.GetString("UserDismissedFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ⏩ {0} forwarded the flag.
+        /// </summary>
+        internal static string UserForwardedFlag {
+            get {
+                return ResourceManager.GetString("UserForwardedFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ✅ {0} resolved the flag.
+        /// </summary>
+        internal static string UserResolvedFlag {
+            get {
+                return ResourceManager.GetString("UserResolvedFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Venue Flagged: Inappropriate content.
+        /// </summary>
+        internal static string VenueFlaggedInappropriateContent {
+            get {
+                return ResourceManager.GetString("VenueFlaggedInappropriateContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Venue Flagged: Site information incorrect.
+        /// </summary>
+        internal static string VenueFlaggedInfoIncorrect {
+            get {
+                return ResourceManager.GetString("VenueFlaggedInfoIncorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Venue Flagged: Venue empty.
+        /// </summary>
+        internal static string VenueFlaggedVenueEmpty {
+            get {
+                return ResourceManager.GetString("VenueFlaggedVenueEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ❎ You dismissed the flag.
+        /// </summary>
+        internal static string YouDismissedFlag {
+            get {
+                return ResourceManager.GetString("YouDismissedFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ✅ You resolved the flag.
+        /// </summary>
+        internal static string YouResolvedFlag {
+            get {
+                return ResourceManager.GetString("YouResolvedFlag", resourceCulture);
             }
         }
     }

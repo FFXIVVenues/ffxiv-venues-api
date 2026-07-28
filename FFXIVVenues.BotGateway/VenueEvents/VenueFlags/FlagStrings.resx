@@ -117,10 +117,103 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CloseVenue" xml:space="preserve">
+    <value>Close Venue</value>
+  </data>
+  <data name="CloseVenueDescription" xml:space="preserve">
+    <value>Put this venue on a hiatus for up to 3 months.</value>
+  </data>
+  <data name="CouldNotForward" xml:space="preserve">
+    <value>I couldn't forward the flag to any managers. 🥲</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. This shows when the owner/managers of the venue are uncontactable for some reason.</comment>
+  </data>
+  <data name="DismissFlag" xml:space="preserve">
+    <value>Dismiss Flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="DismissFlagDescription" xml:space="preserve">
+    <value>Dismiss the flag as needing no action.</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="EditVenue" xml:space="preserve">
+    <value>Edit Venue</value>
+  </data>
+  <data name="EditVenueDescription" xml:space="preserve">
+    <value>Update the details on this venue.</value>
+  </data>
+  <data name="FlagDismissed" xml:space="preserve">
+    <value>Flag dismissed, mew!</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
   <data name="FlagReceived" xml:space="preserve">
     <value>Meow! We've received a flag about your venue, could you take a lookie please! ♥</value>
   </data>
+  <data name="FlagResolved" xml:space="preserve">
+    <value>Flag resolved, thankies!</value>
+  </data>
+  <data name="ForwardFlag" xml:space="preserve">
+    <value>Forward Flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
+  </data>
+  <data name="ForwardFlagDescription" xml:space="preserve">
+    <value>Forward the flag to venue owners/managers for actioning.</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
+  </data>
+  <data name="ForwardedFlagTo" xml:space="preserve">
+    <value>I've forwarded the flag to {0}! 😊</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} will be the name of the owner(s) that the flag was forwarded to. </comment>
+  </data>
   <data name="NoPermission" xml:space="preserve">
     <value>Sorry, you don't have permission to do that. 🥲</value>
+  </data>
+  <data name="PermanentlyClose" xml:space="preserve">
+    <value>Permanently Close / Delete</value>
+  </data>
+  <data name="PermanentlyCloseDescription" xml:space="preserve">
+    <value>Delete this venue completely.</value>
+  </data>
+  <data name="ResolveFlag" xml:space="preserve">
+    <value>Resolve Flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
+  </data>
+  <data name="SelectResponse" xml:space="preserve">
+    <value>Select response</value>
+    <comment>In the context of selecting a response to a flag, a flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="UserDismissedFlag" xml:space="preserve">
+    <value>❎ {0} dismissed the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} is the discord name of the user that dismissed the flag. It'll be clickable. </comment>
+  </data>
+  <data name="UserForwardedFlag" xml:space="preserve">
+    <value>⏩ {0} forwarded the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} is the discord name of the user that forwarded the flag. It'll be clickable. </comment>
+  </data>
+  <data name="UserResolvedFlag" xml:space="preserve">
+    <value>✅ {0} resolved the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. {0} is the discord name of the user that resolved the flag. It'll be clickable. </comment>
+  </data>
+  <data name="VenueFlaggedInappropriateContent" xml:space="preserve">
+    <value>Venue Flagged: Inappropriate content</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="VenueFlaggedInfoIncorrect" xml:space="preserve">
+    <value>Venue Flagged: Site information incorrect</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="VenueFlaggedVenueEmpty" xml:space="preserve">
+    <value>Venue Flagged: Venue empty</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. "Venue empty" described that the venue had no one in the property at the time it was supposed to be open. </comment>
+  </data>
+  <data name="YouDismissedFlag" xml:space="preserve">
+    <value>❎ You dismissed the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="YouResolvedFlag" xml:space="preserve">
+    <value>✅ You resolved the flag</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into. </comment>
+  </data>
+  <data name="ResolveFlagDescription" xml:space="preserve">
+    <value>The flag has been handled with corrective actions.</value>
+    <comment>A flag is a user initiated alert that a venue may be incorrect or inappropriate and needs looking into.</comment>
   </data>
 </root>

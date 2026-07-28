@@ -3,8 +3,10 @@ using Discord.Rest;
 using Discord.WebSocket;
 using FFXIVVenues.BotGateway.Api;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
+using FFXIVVenues.BotGateway.Utils;
 using FFXIVVenues.FlagService.Client.Events;
 using Serilog;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,7 +22,7 @@ public class FlagResolvedHandler(IRepository repository, IApiService apiService,
         foreach (var flagDistributionMessage in flagDistribution.Messages)
         {
             var channel = await client.GetChannelAsync(flagDistributionMessage.ChannelId);
-            if (channel is SocketTextChannel textChannel)
+            if (channel is ITextChannel textChannel)
             {
                 await textChannel.ModifyMessageAsync(flagDistributionMessage.MessageId, props =>
                 {
@@ -28,16 +30,16 @@ public class FlagResolvedHandler(IRepository repository, IApiService apiService,
                     props.Embeds = new[]
                     {
                     flagEmbed.Build(),
-                    new EmbedBuilder().WithDescription($"{MentionUtils.MentionUser(@event.ResolvedBy)} resolved the flag").Build()
+                    new EmbedBuilder().WithDescription(FlagStrings.UserResolvedFlag.Fmt(MentionUtils.MentionUser(@event.ResolvedBy))).Build()
                 };
                 });
             }
-            else if (channel is RestDMChannel dmChannel)
+            else if (channel is IDMChannel dmChannel)
             {
-                var isResolver = dmChannel.Users.Any(u => u.Id == @event.ResolvedBy);
-                var message = $"✅ You resolved the flag";
+                var isResolver = dmChannel.Recipient.Id == @event.ResolvedBy;
+                var message = FlagStrings.YouResolvedFlag;
                 if (!isResolver)
-                    message = $"✅ {MentionUtils.MentionUser(@event.ResolvedBy)} resolved the flag";
+                    message = FlagStrings.UserResolvedFlag.Fmt(MentionUtils.MentionUser(@event.ResolvedBy));
 
                 await dmChannel.ModifyMessageAsync(flagDistributionMessage.MessageId, props =>
                 {
