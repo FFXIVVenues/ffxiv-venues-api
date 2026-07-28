@@ -34,7 +34,7 @@ public class DismissFlagHandler(
         }
 
         await flagServiceClient.DismissFlagAsync(flagId, userId);
-        await context.Interaction.FollowupAsync("Flag dismissed, mew!", flags: MessageFlags.Ephemeral);
+        await context.Interaction.FollowupAsync(FlagStrings.FlagDismissed, flags: MessageFlags.Ephemeral);
     }
     
 }

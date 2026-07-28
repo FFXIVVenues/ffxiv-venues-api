@@ -29,6 +29,6 @@ public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepositor
         }
 
         await flagServiceClient.ResolveFlagAsync(flagId, userId);
-        await context.Interaction.FollowupAsync("Flag resolved, thankies!", flags: MessageFlags.Ephemeral);
+        await context.Interaction.FollowupAsync(FlagStrings.FlagResolved, flags: MessageFlags.Ephemeral);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 using FFXIVVenues.BotGateway.Api;
 using FFXIVVenues.BotGateway.Infrastructure.Persistence.Abstraction;
+using FFXIVVenues.BotGateway.Utils;
 using FFXIVVenues.FlagService.Client.Events;
 using Serilog;
 using System.Linq;
@@ -19,26 +21,26 @@ public class FlagDismissedHandler(IRepository repository, IDiscordClient client,
         foreach (var flagDistributionMessage in flagDistribution.Messages)
         {
             var channel = await client.GetChannelAsync(flagDistributionMessage.ChannelId);
-            if (channel is SocketTextChannel socketTextChannel)
+            if (channel is ITextChannel textChannel)
             {
-                await socketTextChannel.ModifyMessageAsync(flagDistributionMessage.MessageId, props =>
+                await textChannel.ModifyMessageAsync(flagDistributionMessage.MessageId, props =>
                 {
                     props.Components = new ComponentBuilder().Build();
                     props.Embeds = new[]
                     {
                         flagEmbed.Build(),
-                        new EmbedBuilder().WithDescription($"{MentionUtils.MentionUser(@event.DismissedBy)} dismissed the flag").Build()
+                        new EmbedBuilder().WithDescription(FlagStrings.UserDismissedFlag.Fmt(MentionUtils.MentionUser(@event.DismissedBy))).Build()
                     };
                 });
             }
-            else if (channel is SocketDMChannel socketDMChannel)
+            else if (channel is IDMChannel dmChannel)
             {
-                var isResolver = socketDMChannel.Users.Any(u => u.Id == @event.DismissedBy);
-                var message = $"❎ You dismissed the flag";
+                var isResolver = dmChannel.Recipient.Id == @event.DismissedBy;
+                var message = FlagStrings.YouDismissedFlag;
                 if (!isResolver)
-                    message = $"❎ {MentionUtils.MentionUser(@event.DismissedBy)} dismissed the flag";
+                    message = FlagStrings.UserDismissedFlag.Fmt(MentionUtils.MentionUser(@event.DismissedBy));
 
-                await socketDMChannel.ModifyMessageAsync(flagDistributionMessage.MessageId, props =>
+                await dmChannel.ModifyMessageAsync(flagDistributionMessage.MessageId, props =>
                 {
                     props.Components = new ComponentBuilder().Build();
                     props.Embeds = new[]
