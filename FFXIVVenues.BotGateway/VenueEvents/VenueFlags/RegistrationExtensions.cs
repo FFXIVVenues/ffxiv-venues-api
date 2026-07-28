@@ -17,7 +17,7 @@ public static class RegistrationExtensions
 
         componentBroker.Add<EditVenueFlagHandler>(EditVenueFlagHandler.Key);
         componentBroker.Add<TemporarilyCloseVenueFlagHandler>(TemporarilyCloseVenueFlagHandler.Key);
-        componentBroker.Add<PermanantlyCloseVenueFlagHandler>(PermanantlyCloseVenueFlagHandler.Key);
+        componentBroker.Add<PermanentlyCloseVenueFlagHandler>(PermanentlyCloseVenueFlagHandler.Key);
 
         return componentBroker;
     }

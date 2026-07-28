@@ -47,7 +47,7 @@ internal class CloseEntryState : ISessionState
         if (hasFutureClosure)
             selectComponent.AddOption("Cancel future closure", "CancelClosure");
 
-        selectComponent.AddOption("Permenently Close (Delete)", "PermanentlyClose");
+        selectComponent.AddOption("Permanently Close (Delete)", "PermanentlyClose");
 
         return new ComponentBuilder().WithSelectMenu(selectComponent).WithBackButton(c);
     }

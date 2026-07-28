@@ -11,7 +11,7 @@ namespace FFXIVVenues.BotGateway.VenueEvents.VenueFlags.Responses;
 
 public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepository repository, IApiService apiService, IAuthorizer authorizer) : IComponentHandler
 {
-    public static string Key => "RESOLVE_FLAG";
+    public static string Key => "FLAG_RESPONSE_RESOLVE";
 
 
     public async Task HandleAsync(ComponentVeniInteractionContext context, string[] args)
@@ -24,7 +24,7 @@ public class ResolveFlagHandler(IFlagServiceClient flagServiceClient, IRepositor
 
         if (!authorizer.Authorize(context.Interaction.User.Id, Permission.RespondToFlags, venue).Authorized)
         {
-            await context.Interaction.Message.ReplyAsync("Sorry, you don't have permission to do that. 🥲", flags: MessageFlags.Ephemeral);
+            await context.Interaction.Message.ReplyAsync(FlagStrings.NoPermission, flags: MessageFlags.Ephemeral);
             return;
         }
 

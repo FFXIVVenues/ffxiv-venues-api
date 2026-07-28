@@ -63,7 +63,7 @@ public class ForwardFlagHandler(IVenueFlagRenderer flagRenderer, IDiscordClient 
                             .WithLabel("Permanently Close / Delete")
                             .WithEmote(new Emoji("❌"))
                             .WithDescription("Delete this venue completely.")
-                            .WithStaticHandler(PermanantlyCloseVenueFlagHandler.Key, flag.id))
+                            .WithStaticHandler(PermanentlyCloseVenueFlagHandler.Key, flag.id))
                        ));
         var broadcastReceipt = await broadcast.SendToAsync(venue.Managers.Select(ulong.Parse).ToArray());
         var successful = broadcastReceipt.BroadcastMessages.Where(m => m.Status == MessageStatus.Sent).Select(b => b.UserId);
