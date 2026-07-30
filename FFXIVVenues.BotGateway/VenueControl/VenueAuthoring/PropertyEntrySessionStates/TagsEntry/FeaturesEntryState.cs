@@ -62,7 +62,7 @@ class FeaturesEntrySessionState : ISessionState
         return new ComponentBuilder()
             .WithSelectMenu(selectComponent)
             .WithBackButton(c)
-            .WithSkipButton<GamesEntrySessionState, ConfirmVenueSessionState>(c);
+            .WithSkipButton<GamesEntrySessionState, GamesEntrySessionState>(c);
     }
 
     private Task OnComplete(ComponentVeniInteractionContext c)
