@@ -55,6 +55,7 @@ class FeaturesEntrySessionState : ISessionState
     {
         var selectComponent = new SelectMenuBuilder()
             .WithCustomId(c.Session.RegisterComponentHandler(OnComplete, ComponentPersistence.ClearRow))
+            .WithMinValues(0)
             .WithMaxValues(_availableTags.Count);
         foreach (var (label, desc, value, emote) in _availableTags)
             selectComponent.AddOption(label, value, isDefault: this._venue.Tags.Contains(value), description: desc, emote: new Emoji(emote));
