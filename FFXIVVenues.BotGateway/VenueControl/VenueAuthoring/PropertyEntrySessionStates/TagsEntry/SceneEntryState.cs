@@ -44,6 +44,7 @@ class SceneEntrySessionState : ISessionState
     {
         var selectComponent = new SelectMenuBuilder()
             .WithCustomId(c.Session.RegisterComponentHandler(OnComplete, ComponentPersistence.ClearRow))
+            .WithMinValues(0)
             .WithMaxValues(Math.Max(2, _availableScenes.Count(t => this._venue.Tags?.Contains(t.Value) ?? false)));
         foreach (var (label, value, emote) in _availableScenes)
             selectComponent.AddOption(label, value, isDefault: this._venue.Tags.Contains(value), emote: new Emoji(emote));

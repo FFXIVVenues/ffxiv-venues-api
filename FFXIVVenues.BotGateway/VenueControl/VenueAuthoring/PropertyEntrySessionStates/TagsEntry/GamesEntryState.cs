@@ -38,6 +38,7 @@ class GamesEntrySessionState : ISessionState
     {
         var selectComponent = new SelectMenuBuilder()
             .WithCustomId(c.Session.RegisterComponentHandler(OnComplete, ComponentPersistence.ClearRow))
+            .WithMinValues(0)
             .WithMaxValues(_availableGames.Count);
         foreach (var (label, description, value, emote) in _availableGames)
             selectComponent.AddOption(label, value, isDefault: this._venue.Tags.Contains(value), description: description, emote: new Emoji(emote));
