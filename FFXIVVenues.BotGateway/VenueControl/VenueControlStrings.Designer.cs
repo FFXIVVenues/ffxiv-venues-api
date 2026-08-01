@@ -232,6 +232,15 @@ namespace FFXIVVenues.BotGateway.VenueControl {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ooo, interesting! In as few characters as possible, where is your venue **located**? 🥰.
+        /// </summary>
+        internal static string AskForOtherLocationMessage {
+            get {
+                return ResourceManager.GetString("AskForOtherLocationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Oki! Select the **scenes** that best describe your venue (maximum 2). 🙂.
         /// </summary>
         internal static string AskForScenesMessage {
@@ -300,6 +309,15 @@ namespace FFXIVVenues.BotGateway.VenueControl {
         internal static string AskWhenInMonthMessage {
             get {
                 return ResourceManager.GetString("AskWhenInMonthMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to @ Veni Ki with your answer.
+        /// </summary>
+        internal static string AtVeniWithAnswerMessage {
+            get {
+                return ResourceManager.GetString("AtVeniWithAnswerMessage", resourceCulture);
             }
         }
         

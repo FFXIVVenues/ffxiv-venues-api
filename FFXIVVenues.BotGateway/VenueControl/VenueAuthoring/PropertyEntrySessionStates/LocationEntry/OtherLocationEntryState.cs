@@ -15,7 +15,13 @@ internal class OtherLocationEntrySessionState : ISessionState
     public Task Enter(VeniInteractionContext c)
     {
         c.Session.RegisterMessageHandler(this.MessageHandler);
-        return c.Interaction.RespondAsync("Ooo, interesting! In as few characters as possible, where is your venue **located**? 🥰", new ComponentBuilder()
+        var isDm = c.Interaction.Channel is IDMChannel;
+
+        var message = VenueControlStrings.AskForOtherLocationMessage;
+        if (!isDm)
+            message += "\n-# " + VenueControlStrings.AtVeniWithAnswerMessage;
+
+        return c.Interaction.RespondAsync(message, new ComponentBuilder()
             .WithBackButton(c).Build());
     }
 

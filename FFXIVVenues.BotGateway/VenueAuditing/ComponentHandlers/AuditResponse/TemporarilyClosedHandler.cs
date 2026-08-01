@@ -31,7 +31,7 @@ public class TemporarilyClosedHandler(
             await context.Interaction.Message.Channel.SendMessageAsync("Sorry, I can't let you do that. 🥲");
             return;
         }
-        
+
         context.Session.SetVenue(venue);
         await context.Session.MoveStateAsync<CloseEntryState>(context);
         

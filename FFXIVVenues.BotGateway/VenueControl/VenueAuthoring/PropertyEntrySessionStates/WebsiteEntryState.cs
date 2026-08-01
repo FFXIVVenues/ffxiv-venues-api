@@ -16,15 +16,14 @@ namespace FFXIVVenues.BotGateway.VenueControl.VenueAuthoring.PropertyEntrySessio
         {
             c.Session.RegisterMessageHandler(this.OnMessageReceived);
             var isDm = c.Interaction.Channel is IDMChannel;
+            var message = MessageRepository.AskForWebsiteMessage.PickRandom();
+            if (!isDm)
+                message += "\n-# " + VenueControlStrings.AtVeniWithAnswerMessage;
 
-            return c.Interaction.RespondAsync(MessageRepository.AskForWebsiteMessage.PickRandom(),
+            return c.Interaction.RespondAsync(message,
                 new ComponentBuilder()
                     .WithBackButton(c)
                     .WithButton("No website", c.Session.RegisterComponentHandler(OnNoWebsite, ComponentPersistence.ClearRow), ButtonStyle.Secondary)
-                    .Build(),
-                isDm ? null : new EmbedBuilder()
-                    .WithDescription("**@ Veni Ki** with your web link")
-                    .WithColor(Color.Blue)
                     .Build());
         }
 
