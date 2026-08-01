@@ -43,14 +43,17 @@ class InconsistentOpeningTimeEntrySessionState(IAuthorizer authorizer) : ISessio
             c.Session.ClearItem(SessionKeys.NOW_SETTING_SLOT);
         }
 
-        this._nowSettingDay ??= 0;
-        var message = !this._nowSettingClosing.Value ? VenueControlStrings.AskForOpenTimeOnDayMessage : VenueControlStrings.AskForCloseTimeOnDayMessage;
         var isDm = c.Interaction.Channel is IDMChannel;
-        var openingForDayMessage = string.Format(message, _venue.Schedule[this._nowSettingDay.Value].Day);
-            
-        return c.Interaction.RespondAsync($"{MessageRepository.ConfirmMessage.PickRandom()} {openingForDayMessage}",
-            new ComponentBuilder().WithBackButton(c).Build(),
-            isDm ? null : new EmbedBuilder().WithDescription("**@ Veni Ki** with your time").WithColor(Color.Blue).Build());
+        this._nowSettingDay ??= 0;
+        var message = MessageRepository.ConfirmMessage.PickRandom() + " ";
+        message += !this._nowSettingClosing.Value ? VenueControlStrings.AskForOpenTimeOnDayMessage : VenueControlStrings.AskForCloseTimeOnDayMessage;
+        message = string.Format(message, _venue.Schedule[this._nowSettingDay.Value].Day);
+
+        if (!isDm)
+            message += "\n-# " + VenueControlStrings.AtVeniWithAnswerMessage;
+
+        return c.Interaction.RespondAsync(message,
+            new ComponentBuilder().WithBackButton(c).Build());
     }
 
     public Task OnMessageReceived(MessageVeniInteractionContext c)

@@ -14,7 +14,13 @@ class RoomEntrySessionState : ISessionState
     public Task Enter(VeniInteractionContext c)
     {
         c.Session.RegisterMessageHandler(this.OnMessageReceived);
-        return c.Interaction.RespondAsync(MessageRepository.AskForRoomMessage.PickRandom(),
+
+        var isDm = c.Interaction.Channel is IDMChannel;
+        var message = MessageRepository.AskForRoomMessage.PickRandom();
+        if (!isDm)
+            message += "\n-# " + VenueControlStrings.AtVeniWithAnswerMessage;
+
+        return c.Interaction.RespondAsync(message,
             new ComponentBuilder().WithBackButton(c).Build());
     }
 

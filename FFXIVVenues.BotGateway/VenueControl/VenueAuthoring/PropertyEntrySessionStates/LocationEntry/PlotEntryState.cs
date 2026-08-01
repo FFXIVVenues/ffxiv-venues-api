@@ -15,12 +15,11 @@ class PlotEntrySessionState : ISessionState
     {
         c.Session.RegisterMessageHandler(this.OnMessageReceived);
         var isDm = c.Interaction.Channel is IDMChannel;
-        return c.Interaction.RespondAsync(MessageRepository.AskForPlotMessage.PickRandom(),
-            new ComponentBuilder().WithBackButton(c).Build(),
-            isDm ? null : new EmbedBuilder()
-                .WithDescription("**@ Veni Ki** with your plot number")
-                .WithColor(Color.Blue)
-                .Build());
+        var message = MessageRepository.AskForPlotMessage.PickRandom();
+        if (!isDm)
+            message += "\n-# " + VenueControlStrings.AtVeniWithAnswerMessage;
+        return c.Interaction.RespondAsync(message,
+            new ComponentBuilder().WithBackButton(c).Build());
     }
 
     public Task OnMessageReceived(MessageVeniInteractionContext c)
