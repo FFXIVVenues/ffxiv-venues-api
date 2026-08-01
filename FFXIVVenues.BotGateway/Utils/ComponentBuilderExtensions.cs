@@ -5,6 +5,7 @@ using FFXIVVenues.BotGateway.Infrastructure.Components;
 using FFXIVVenues.BotGateway.VenueControl;
 using FFXIVVenues.BotGateway.Infrastructure.Context;
 using FFXIVVenues.BotGateway.Infrastructure.Context.SessionHandling;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace FFXIVVenues.BotGateway.Utils
 {
@@ -25,14 +26,18 @@ namespace FFXIVVenues.BotGateway.Utils
 
         public static ComponentBuilder WithBackButton(this ComponentBuilder builder, IVeniInteractionContext context, Func<Task<bool>> @override = null)
         {   
-            return builder.WithButton("◄  Back", context.Session.RegisterComponentHandler(async c =>
+            if (context.Session.CanGoBack(context))
             {
-                var result = false;
-                if (@override != null) result = await @override();
-                else result = await c.Session.TryBackStateAsync(c);
-                if (result) _ = c.Interaction.ModifyOriginalResponseAsync(props => props.Components = new ComponentBuilder().Build());
-                else await c.Interaction.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDescription("Cannot not go back any more!").Build());
-            }, ComponentPersistence.ClearRow), ButtonStyle.Secondary);
+                return builder.WithButton("◄  Back", context.Session.RegisterComponentHandler(async c =>
+                {
+                    var result = false;
+                    if (@override != null) result = await @override();
+                    else result = await c.Session.TryBackStateAsync(c);
+                    if (result) _ = c.Interaction.ModifyOriginalResponseAsync(props => props.Components = new ComponentBuilder().Build());
+                    else await c.Interaction.Channel.SendMessageAsync(embed: new EmbedBuilder().WithDescription("Cannot not go back any more!").Build());
+                }, ComponentPersistence.ClearRow), ButtonStyle.Secondary);
+            }
+            return builder;
         }
 
     }

@@ -54,6 +54,9 @@ namespace FFXIVVenues.BotGateway.Infrastructure.Context.SessionHandling
         public Task MoveStateAsync<T>(IWrappableInteraction context) where T : ISessionState =>
             this.MoveStateAsync<T>(context.ToWrappedInteraction());
 
+        public bool CanGoBack(IVeniInteractionContext context) =>
+            StateStack.Count > 1;
+
         public async Task<bool> TryBackStateAsync(VeniInteractionContext context)
         {
             if (!StateStack.TryPop(out var currentState))
