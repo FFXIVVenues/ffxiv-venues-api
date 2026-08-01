@@ -25,17 +25,7 @@ namespace FFXIVVenues.BotGateway.VenueControl.VenueAuthoring.VenueEditing.Sessio
             c.Session.SetEditing(true);
             var venue = c.Session.GetVenue();
 
-            if (c.Interaction.IsDM)
-                return c.Interaction.RespondAsync(MessageRepository.EditVenueMessage.PickRandom(), 
-                    component: this._venueRenderer.RenderEditComponents(venue, c.Interaction.User.Id).Build());
-
-            var @warningEmbed = new EmbedBuilder
-            {
-                Color = Color.Red,
-                Description = MessageRepository.MentionOrReplyToMeMessage.PickRandom()
-            };
             return c.Interaction.RespondAsync(MessageRepository.EditVenueMessage.PickRandom(),
-              embed: @warningEmbed.Build(),
               component: this._venueRenderer.RenderEditComponents(venue, c.Interaction.User.Id).Build());
         }
 

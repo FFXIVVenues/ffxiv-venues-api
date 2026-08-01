@@ -35,13 +35,16 @@ class ConsistentOpeningTimeEntrySessionState(IAuthorizer authorizer) : ISessionS
             c.Session.ClearItem(SessionKeys.NOW_SETTING_CLOSING);
         }
 
-        this._nowSettingClosing ??= false;
-        var message = !this._nowSettingClosing.Value ? VenueControlStrings.AskForOpenTimeMessage : VenueControlStrings.AskForCloseTimeMessage;
         var isDm = c.Interaction.Channel is IDMChannel;
 
-        return c.Interaction.RespondAsync($"{MessageRepository.ConfirmMessage.PickRandom()} {message}",
-            new ComponentBuilder().WithBackButton(c).Build(),
-            isDm ? null : new EmbedBuilder().WithDescription("**@ Veni Ki** with your time").WithColor(Color.Blue).Build());
+        this._nowSettingClosing ??= false;
+        var message = MessageRepository.ConfirmMessage.PickRandom() + " ";
+        message += !this._nowSettingClosing.Value ? VenueControlStrings.AskForOpenTimeMessage : VenueControlStrings.AskForCloseTimeMessage;
+        if (!isDm)
+            message += "\n-# " + VenueControlStrings.AtVeniWithAnswerMessage;
+
+        return c.Interaction.RespondAsync(message,
+            new ComponentBuilder().WithBackButton(c).Build());
     }
 
     public Task OnMessageReceived(MessageVeniInteractionContext c)

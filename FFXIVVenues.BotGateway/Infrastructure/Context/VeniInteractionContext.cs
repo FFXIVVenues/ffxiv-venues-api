@@ -12,7 +12,6 @@ namespace FFXIVVenues.BotGateway.Infrastructure.Context
         : IVeniInteractionContext
         where T : class
     {
-
         public T Interaction { get; } = message;
         public DiscordSocketClient Client { get; } = client;
         public Session Session { get; } = conversation;

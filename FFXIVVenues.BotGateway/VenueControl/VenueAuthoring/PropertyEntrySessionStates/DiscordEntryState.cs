@@ -19,14 +19,15 @@ namespace FFXIVVenues.BotGateway.VenueControl.VenueAuthoring.PropertyEntrySessio
         {
             c.Session.RegisterMessageHandler(this.OnMessageReceived);
             var isDm = c.Interaction.Channel is IDMChannel;
-            return c.Interaction.RespondAsync(MessageRepository.AskForDiscordMessage.PickRandom(),
+
+            var message = MessageRepository.AskForDiscordMessage.PickRandom();
+            if (!isDm)
+                message += "\n-# " + VenueControlStrings.AtVeniWithAnswerMessage;
+
+            return c.Interaction.RespondAsync(message,
                 new ComponentBuilder()
                     .WithBackButton(c)
                     .WithButton("No discord", c.Session.RegisterComponentHandler(OnNoDiscord, ComponentPersistence.ClearRow), ButtonStyle.Secondary)
-                    .Build(),
-                isDm ? null : new EmbedBuilder()
-                    .WithDescription("**@ Veni Ki** with your discord link")
-                    .WithColor(Color.Blue)
                     .Build());
         }
 
