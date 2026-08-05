@@ -26,7 +26,7 @@ public class TemporarilyCloseVenueFlagHandler(IFlagServiceClient flagServiceClie
 
         if (!authorizer.Authorize(context.Interaction.User.Id, Permission.RespondToFlags, venue).Authorized)
         {
-            await context.Interaction.Message.ReplyAsync(FlagStrings.NoPermission, flags: MessageFlags.Ephemeral);
+            await context.Interaction.FollowupAsync(FlagStrings.NoPermission, flags: MessageFlags.Ephemeral);
             return;
         }
 
