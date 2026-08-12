@@ -4,7 +4,7 @@ COPY ./FFXIVVenues.WebHookService /src/FFXIVVenues.WebHookService
 COPY ./FFXIVVenues.VenueService.Client /src/FFXIVVenues.VenueService.Client
 COPY ./FFXIVVenues.DomainData /src/FFXIVVenues.DomainData
 
-RUN dotnet publish /src/FFXIVVenues.OGCardService/FFXIVVenues.OGCardService.csproj -c Release -o /src/build
+RUN dotnet publish /src/FFXIVVenues.WebHookService/FFXIVVenues.WebHookService.csproj -c Release -o /src/build
 
 #-----
 
