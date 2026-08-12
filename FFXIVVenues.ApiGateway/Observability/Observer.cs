@@ -14,7 +14,7 @@ namespace FFXIVVenues.ApiGateway.Observability
         public Func<ObservableOperation, Venue, Task> ObserverAction { get; set; }
 
         public Observer(IEnumerable<ObservableOperation> operationCriteria,
-            ObservableKey? keyCriteria, string valueCriteria) 
+            ObservableKey? keyCriteria = null, string valueCriteria = null) 
             : base(operationCriteria, keyCriteria, valueCriteria)
         {  }
 

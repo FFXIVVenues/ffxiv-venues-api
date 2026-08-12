@@ -23,7 +23,8 @@ class GamesEntrySessionState : ISessionState
         (VenueControlStrings.TagLabel_Deathroll, VenueControlStrings.TagDescription_Deathroll, "Deathroll", "🎲"),
         (VenueControlStrings.TagLabel_TexasHoldem, VenueControlStrings.TagDescription_TexasHoldem, "Texas holdem", "♠️"),
         (VenueControlStrings.TagLabel_Bingo, VenueControlStrings.TagDescription_Bingo, "Bingo", "🔢"),
-        (VenueControlStrings.TagLabel_Roulette, VenueControlStrings.TagDescription_Roulette, "Roulette", "🎡")
+        (VenueControlStrings.TagLabel_Roulette, VenueControlStrings.TagDescription_Roulette, "Roulette", "🎡"),
+        (VenueControlStrings.TagLabel_OtherGames, VenueControlStrings.TagDescription_OtherGames, "Other Games", "👾")
     };
 
     public Task Enter(VeniInteractionContext c)
