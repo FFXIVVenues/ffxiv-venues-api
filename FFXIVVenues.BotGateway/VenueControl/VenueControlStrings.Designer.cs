@@ -781,6 +781,15 @@ namespace FFXIVVenues.BotGateway.VenueControl {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The venue offers other unique games..
+        /// </summary>
+        internal static string TagDescription_OtherGames {
+            get {
+                return ResourceManager.GetString("TagDescription_OtherGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Photographers take snapshots or complex gpose of guests to create memories..
         /// </summary>
         internal static string TagDescription_Photography {
@@ -1056,6 +1065,15 @@ namespace FFXIVVenues.BotGateway.VenueControl {
         internal static string TagLabel_OpenStage {
             get {
                 return ResourceManager.GetString("TagLabel_OpenStage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other games.
+        /// </summary>
+        internal static string TagLabel_OtherGames {
+            get {
+                return ResourceManager.GetString("TagLabel_OtherGames", resourceCulture);
             }
         }
         

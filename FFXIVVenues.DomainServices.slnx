@@ -13,4 +13,6 @@
   <Project Path="FFXIVVenues.FlagService.Client/FFXIVVenues.FlagService.Client.csproj" />
   <Project Path="FFXIVVenues.FlagService/FFXIVVenues.FlagService.csproj" />
   <Project Path="FFXIVVenues.OGCardService/FFXIVVenues.OGCardService.csproj" />
+  <Project Path="FFXIVVenues.WebHookService/FFXIVVenues.WebHookService.csproj" Id="a7a1204f-d562-486c-8237-d773bc579628" />
+  <Project Path="FFXIVVenues.VenueService.Client/FFXIVVenues.VenueService.Client.csproj" Id="4d961395-210e-4275-b656-9245d23127e6" />
 </Solution>

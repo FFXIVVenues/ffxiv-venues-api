@@ -515,4 +515,10 @@ We do not support 'always open houses' or unstaffed openings, please only list e
   <data name="AskForOtherLocationMessage" xml:space="preserve">
     <value>Ooo, interesting! In as few characters as possible, where is your venue **located**? 🥰</value>
   </data>
+  <data name="TagLabel_OtherGames" xml:space="preserve">
+    <value>Other games</value>
+  </data>
+  <data name="TagDescription_OtherGames" xml:space="preserve">
+    <value>The venue offers other unique games.</value>
+  </data>
 </root>

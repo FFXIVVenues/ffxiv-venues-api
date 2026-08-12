@@ -3,6 +3,7 @@
 COPY ./FFXIVVenues.ApiGateway /src/FFXIVVenues.ApiGateway
 COPY ./FFXIVVenues.DomainData /src/FFXIVVenues.DomainData
 COPY ./FFXIVVenues.FlagService.Client /src/FFXIVVenues.FlagService.Client
+COPY ./FFXIVVenues.VenueService.Client /src/FFXIVVenues.VenueService.Client
 
 RUN dotnet publish /src/FFXIVVenues.ApiGateway/FFXIVVenues.ApiGateway.csproj -c Release -o /src/build
 

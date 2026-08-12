@@ -48,6 +48,9 @@ jobs:
           - name: OGCardService
             path: FFXIVVenues.OGCardService
             image: ffxivvenues.ogcardservice
+          - name: WebHookService
+            path: FFXIVVenues.WebHookService
+            image: ffxivvenues.webhookservice
         platform:
           - name: amd64
             runner: ubuntu-24.04
@@ -90,6 +93,8 @@ jobs:
             image: ffxivvenues.flagservice
           - name: OGCardService
             image: ffxivvenues.ogcardservice
+          - name: WebHookService
+            image: ffxivvenues.webhookservice
 
     name: Publish ${{ matrix.name }} multiplatform manifest
     runs-on: ubuntu-latest
