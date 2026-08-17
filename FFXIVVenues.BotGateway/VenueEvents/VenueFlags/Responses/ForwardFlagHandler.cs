@@ -93,7 +93,7 @@ public class ForwardFlagHandler(IVenueFlagRenderer flagRenderer, IDiscordClient 
                 props.Embeds = new[]
                 {
                     flagEmbed.Build(),
-                    new EmbedBuilder().WithDescription(FlagStrings.UserForwardedFlag.Fmt(MentionUtils.MentionUser(userId))).Build(),
+                    new EmbedBuilder().WithDescription(FlagStrings.UserForwardedFlag.Fmt(MentionUtils.MentionUser(userId))).WithCurrentTimestamp().Build(),
                 };
                 props.Components = flagOptionsComponent;
             });
