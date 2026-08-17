@@ -47,7 +47,7 @@ public class FlagResolvedHandler(IRepository repository, IApiService apiService,
                     props.Embeds = new[]
                     {
                         flagEmbed.Build(),
-                        new EmbedBuilder().WithDescription(message).Build()
+                        new EmbedBuilder().WithDescription(message).WithCurrentTimestamp().Build()
                     };
                 });
             }

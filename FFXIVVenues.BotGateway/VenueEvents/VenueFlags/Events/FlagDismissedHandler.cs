@@ -46,7 +46,7 @@ public class FlagDismissedHandler(IRepository repository, IDiscordClient client,
                     props.Embeds = new[]
                     {
                         flagEmbed.Build(),
-                        new EmbedBuilder().WithDescription(message).Build()
+                        new EmbedBuilder().WithDescription(message).WithCurrentTimestamp().Build()
                     };
                 });
             }
